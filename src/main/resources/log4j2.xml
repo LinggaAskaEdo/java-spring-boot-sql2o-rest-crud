@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Properties>
+        <Property name="log-path">/var/log/app/java-spring-boot-sql2o-rest-crud/</Property>
+    </Properties>
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%T] [%X{requestId}] %level %logger{10} - %msg%n"/>
+        </Console>
+        <RollingFile name="java-spring-boot-sql2o-rest-crud" fileName="${log-path}/java-spring-boot-sql2o-rest-crud.log"
+                     filePattern="${log-path}/java-spring-boot-sql2o-rest-crud-%d{yyyy-MM-dd}-%i.old.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%T] [%X{requestId}] %level %logger{10} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="10000 KB"/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Logger name="com.otis" level="DEBUG" additivity="false">
+            <AppenderRef ref="java-spring-boot-sql2o-rest-crud"/>
+        </Logger>
+    </Loggers>
+</Configuration>

@@ -1,0 +1,8 @@
+@NAME(GetAllTutorial)
+    SELECT id, title, description, published FROM tutorials
+
+@NAME(GetTutorialByTitleContain)
+    SELECT id, title, description, published FROM tutorials WHERE title LIKE :title
+
+@NAME(GetTutorialById)
+    SELECT id, title, description, published FROM tutorials WHERE id = :id
