@@ -55,4 +55,17 @@ public class ProductController {
 
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
+
+    @GetMapping("/products/report")
+    public ResponseEntity<List<Product>> getReportData() {
+        List<Product> products = new ArrayList<>();
+
+        service.getReportData();
+
+        if (products.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
 }

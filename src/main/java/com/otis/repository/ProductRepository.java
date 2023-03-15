@@ -1,5 +1,6 @@
 package com.otis.repository;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,5 +86,18 @@ public class ProductRepository {
         }
 
         return result;
+    }
+
+    public List<Map<String, Object>> getReportData() {
+        String sql = bundle.getSql("GetReportData");
+        logger.info("GetReportData: {}", sql);
+
+        try (Connection connection = sql2o.open(); Query query = connection.createQuery(sql)) {
+            return query.executeAndFetchTable().asList();
+        } catch (Exception e) {
+            logger.error("Error when findProductByCompanyID: ", e);
+        }
+
+        return Collections.emptyList();
     }
 }

@@ -6,3 +6,9 @@
 
 @NAME(GetProductByCompanyID)
     SELECT id, name, company_id FROM products WHERE company_id = :company_id
+
+@NAME(GetReportData)
+    SELECT p.id AS product_id, p.name AS product_name, c.id AS company_id , c.name AS company_name
+    FROM products p 
+        INNER JOIN products_company pc ON p.id = pc.product_id 
+        INNER JOIN  company c ON c.id = pc.company_id; 
