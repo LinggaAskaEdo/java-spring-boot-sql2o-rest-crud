@@ -34,9 +34,9 @@ public class TutorialController {
         List<Tutorial> tutorials = new ArrayList<>();
 
         if (title == null)
-            service.findAll().forEach(tutorials::add);
+            tutorials.addAll(service.findAll());
         else
-            service.findByTitleContaining(title).forEach(tutorials::add);
+            tutorials.addAll(service.findByTitleContaining(title));
         if (tutorials.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }

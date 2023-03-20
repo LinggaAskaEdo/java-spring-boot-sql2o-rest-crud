@@ -49,7 +49,8 @@ public class ProductService {
         return productRepository.findProductByCompanyID(company.getId());
     }
 
-    public void getReportData() {
+    public Response getReportData() {
+        Response response = new Response();
         Map<Product, List<Company>> responseMap = new HashMap<>();
 
         List<Map<String, Object>> results = productRepository.getReportData();
@@ -82,7 +83,6 @@ public class ProductService {
                 }
             }
 
-            Response response = new Response();
             List<Product> products = new ArrayList<>();
 
             for (Map.Entry<Product, List<Company>> data : responseMap.entrySet()) {
@@ -100,5 +100,7 @@ public class ProductService {
         } else {
             logger.info("Data is empty !!!");
         }
+
+        return response;
     }
 }

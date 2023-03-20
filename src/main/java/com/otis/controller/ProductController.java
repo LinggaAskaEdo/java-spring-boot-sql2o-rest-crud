@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.otis.model.Product;
+import com.otis.model.Response;
 import com.otis.service.ProductService;
 
 @CrossOrigin(origins = "*")
@@ -32,9 +33,9 @@ public class ProductController {
         List<Product> products = new ArrayList<>();
 
         if (name == null)
-            service.findAll().forEach(products::add);
+            products.addAll(service.findAll());
         else
-            service.findByNameContaining(name).forEach(products::add);
+            products.addAll(service.findByNameContaining(name));
 
         if (products.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -44,10 +45,8 @@ public class ProductController {
     }
 
     @GetMapping("/products/company")
-    public ResponseEntity<List<Product>> getProductByCompanyName(@RequestParam(required = true) String companyName) {
-        List<Product> products = new ArrayList<>();
-
-        service.findByCompanyName(companyName).forEach(products::add);
+    public ResponseEntity<List<Product>> getProductByCompanyName(@RequestParam String companyName) {
+        List<Product> products = new ArrayList<>(service.findByCompanyName(companyName));
 
         if (products.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -57,15 +56,14 @@ public class ProductController {
     }
 
     @GetMapping("/products/report")
-    public ResponseEntity<List<Product>> getReportData() {
-        List<Product> products = new ArrayList<>();
+    public ResponseEntity<Response> getReportData() {
 
-        service.getReportData();
+        Response response = service.getReportData();
 
-        if (products.isEmpty()) {
+        if (response.getProducts().isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
-        return new ResponseEntity<>(products, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
