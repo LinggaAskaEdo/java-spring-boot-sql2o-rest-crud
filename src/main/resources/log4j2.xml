@@ -5,12 +5,16 @@
 	</Properties>
 	<Appenders>
 		<Console name="console" target="SYSTEM_OUT">
-			<JsonLayout compact="true" eventEol="true" properties="true"/>
+			<JsonLayout compact="true" eventEol="true" properties="false"
+				includeNull="false" removeThreadName="true" 
+				suppressFields="instant,contextMap,endOfBatch,loggerFqcn,threadPriority"/>
 		</Console>
 		<RollingFile name="app" fileName="${log-path}/app.log"
                      filePattern="${log-path}/app-%d{yyyy-MM-dd}-%i.old.log"
                      ignoreExceptions="false">
-			<JsonLayout compact="true" eventEol="true" properties="true"/>
+			<JsonLayout compact="true" eventEol="true" properties="false"
+				includeNull="false" removeThreadName="true"
+				suppressFields="instant,contextMap,endOfBatch,loggerFqcn,threadPriority"/>
 			<Policies>
 				<TimeBasedTriggeringPolicy interval="1" modulate="true"/>
 				<SizeBasedTriggeringPolicy size="10000 KB"/>
@@ -20,6 +24,7 @@
 	<Loggers>
 		<Logger name="com.otis" level="DEBUG" additivity="false">
 			<AppenderRef ref="app"/>
+			<AppenderRef ref="console"/>
 		</Logger>
 		<Logger name="com.zaxxer.hikari" level="WARN" additivity="false">
 			<AppenderRef ref="app"/>
