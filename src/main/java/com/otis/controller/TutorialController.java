@@ -3,7 +3,6 @@ package com.otis.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -21,35 +20,34 @@ import com.otis.service.TutorialService;
 @RestController
 @RequestMapping("/api")
 public class TutorialController {
-    private final TutorialService service;
+	private final TutorialService service;
 
-    @Autowired
-    public TutorialController(TutorialService service) {
-        this.service = service;
-    }
+	public TutorialController(TutorialService service) {
+		this.service = service;
+	}
 
-    @GetMapping("/tutorials")
-    public ResponseEntity<List<Tutorial>> getAllTutorials(
-            @RequestParam(required = false) String title) {
-        List<Tutorial> tutorials = new ArrayList<>();
+	@GetMapping("/tutorials")
+	public ResponseEntity<List<Tutorial>> getAllTutorials(
+			@RequestParam(required = false) String title) {
+		List<Tutorial> tutorials = new ArrayList<>();
 
-        if (title == null)
-            tutorials.addAll(service.findAll());
-        else
-            tutorials.addAll(service.findByTitleContaining(title));
-        if (tutorials.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
+		if (title == null)
+			tutorials.addAll(service.findAll());
+		else
+			tutorials.addAll(service.findByTitleContaining(title));
+		if (tutorials.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
 
-        return new ResponseEntity<>(tutorials, HttpStatus.OK);
-    }
+		return new ResponseEntity<>(tutorials, HttpStatus.OK);
+	}
 
-    @GetMapping("/tutorials/{id}")
-    public ResponseEntity<Tutorial> getTutorialById(@PathVariable("id") long id) {
-        Tutorial tutorial = service.findById(id)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Not found Tutorial with id = " + id));
+	@GetMapping("/tutorials/{id}")
+	public ResponseEntity<Tutorial> getTutorialById(@PathVariable("id") long id) {
+		Tutorial tutorial = service.findById(id)
+				.orElseThrow(
+						() -> new ResourceNotFoundException("Not found Tutorial with id = " + id));
 
-        return new ResponseEntity<>(tutorial, HttpStatus.OK);
-    }
+		return new ResponseEntity<>(tutorial, HttpStatus.OK);
+	}
 }

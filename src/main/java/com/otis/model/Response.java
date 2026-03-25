@@ -14,5 +14,5 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 public class Response {
-    private List<Product> products;
+	private List<Product> products;
 }

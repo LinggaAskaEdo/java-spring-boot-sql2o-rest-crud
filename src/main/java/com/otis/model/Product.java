@@ -17,8 +17,8 @@ import lombok.Setter;
 @Builder
 @EqualsAndHashCode(cacheStrategy = CacheStrategy.LAZY)
 public class Product {
-    private Long id;
-    private String name;
-    private Long companyID;
-    private List<Company> companies;
+	private Long id;
+	private String name;
+	private Long companyID;
+	private List<Company> companies;
 }

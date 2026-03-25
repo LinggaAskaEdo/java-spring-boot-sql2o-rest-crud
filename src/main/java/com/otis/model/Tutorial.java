@@ -10,8 +10,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Tutorial {
-    private long id;
-    private String title;
-    private String description;
-    private boolean published;
+	private long id;
+	private String title;
+	private String description;
+	private boolean published;
 }
