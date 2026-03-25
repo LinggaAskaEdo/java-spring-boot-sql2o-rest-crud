@@ -50,9 +50,15 @@ src/main/java/com/otis/
 
 src/main/resources/
 ├── application.yaml                    # Application configuration
-├── log4j2.xml                       # Log4j2 JSON configuration
+├── log4j2.xml                          # Log4j2 JSON configuration
+├── META-INF/
+│   └── additional-spring-configuration-metadata.json  # Spring config metadata
 ├── db/migration/
-│   └── V1__initial_schema.sql        # Flyway migration with UUID v7
+│   ├── V20260325130814__create_table_company.sql       # Company table
+│   ├── V20260325130854__create_table_products.sql      # Products table
+│   ├── V20260325130933__create_table_products_company.sql # Product-Company relation
+│   ├── V20260325131006__create_table_tutorials.sql      # Tutorials table
+│   └── V20260325131038__create_table_tutorial_details.sql # Tutorial details table
 └── com/otis/repository/
     ├── CompanyRepository.elsql         # Company SQL queries
     ├── ProductRepository.elsql        # Product SQL queries
