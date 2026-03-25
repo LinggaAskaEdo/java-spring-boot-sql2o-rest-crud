@@ -128,11 +128,19 @@ mvn spring-boot:run
 ### Using Makefile
 
 ```bash
-make clean        # Clean build artifacts
-make build        # Build package (skip tests)
-make run          # Build and run application
-make test         # Run tests
-make db-status    # Check migration status
+# Development
+make help            # Show available commands
+make clean          # Clean build artifacts
+make build          # Build package (skip tests)
+make run            # Build and run application
+make test           # Run tests
+
+# Database Management
+make gen-migration desc=your_description  # Generate new Flyway migration
+make db-migrate     # Run Flyway migrations
+make db-info        # Show migration status
+make db-repair      # Repair Flyway checksum mismatches
+make db-clean       # DROP all database objects (dev only, requires confirmation)
 ```
 
 ### Using Maven
@@ -150,14 +158,19 @@ java -jar target/java-spring-boot-sql2o-rest-crud-1.0-SNAPSHOT.jar
 
 ## Environment Variables
 
-| Variable    | Default                          | Description        |
-| ----------- | -------------------------------- | ------------------ |
-| DB_HOST     | localhost                        | Database host      |
-| DB_PORT     | 3306                             | Database port      |
-| DB_NAME     | java-spring-boot-sql2o-rest-crud | Database name      |
-| DB_USERNAME | root                             | Database username  |
-| DB_PASSWORD | root                             | Database password  |
-| LOG_PATH    | logs                             | Log directory path |
+| Variable           | Default                          | Description        |
+| ------------------ | -------------------------------- | ------------------ |
+| DB_HOST            | localhost                        | Database host      |
+| DB_PORT            | 3306                             | Database port      |
+| DB_NAME            | java-spring-boot-sql2o-rest-crud | Database name      |
+| DB_USERNAME        | root                             | Database username  |
+| DB_PASSWORD        | root                             | Database password  |
+| LOG_PATH           | logs                             | Log directory path |
+| MYSQL_DOCKER_HOST  | localhost                        | MySQL Docker host  |
+| MYSQL_DOCKER_PORT  | 3306                             | MySQL Docker port  |
+| MYSQL_DOCKER_DATABASE | java-spring-boot-sql2o-rest-crud | Database name |
+| MYSQL_DOCKER_USERNAME | root                          | Database username  |
+| MYSQL_DOCKER_PASSWORD |                                | Database password  |
 
 ## Key Features
 
