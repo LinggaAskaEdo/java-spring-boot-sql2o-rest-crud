@@ -17,17 +17,17 @@ help: ## Show this help message
 		| awk 'BEGIN {FS = ":.*##"}; {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}'
 
 clean: ## Clean service and logs
-	mvn clean
-	rm -rf logs/
+	@mvn clean
+	@rm -rf logs/
 
 build: ## Build service (skip tests)
-	mvn package -DskipTests
+	@mvn package -DskipTests
 
 run: build ## Build and run service
-	java -jar $(JAR_FILE)
+	@java -jar $(JAR_FILE)
 
 test: ## Run all tests
-	mvn test
+	@mvn test
 
 gen-migration: ## Generate migration (usage: make gen-migration desc=your_desc)
 	@desc="${desc}"; \

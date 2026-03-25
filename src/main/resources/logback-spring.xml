@@ -1,11 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 	<property name="LOG_PATH" value="${LOG_PATH:-logs}"/>
-
+	<logger name="org.springframework" level="WARN"/>
+	<logger name="org.springframework.boot" level="WARN"/>
+	<logger name="org.springframework.security" level="WARN"/>
+	<logger name="org.hibernate" level="WARN"/>
+	<logger name="org.apache.catalina" level="WARN"/>
+	<logger name="org.apache.tomcat" level="WARN"/>
+	<logger name="org.apache.coyote" level="WARN"/>
+	<logger name="org.springframework.data" level="WARN"/>
+	<logger name="org.springframework.boot.actuate" level="WARN"/>
+	<logger name="com.zaxxer.hikari" level="WARN"/>
+	<logger name="com.otis" level="DEBUG"/>
 	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder class="ch.qos.logback.classic.encoder.JsonEncoder"/>
+		<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+			<providers>
+				<timestamp/>
+				<logLevel/>
+				<threadName/>
+				<message/>
+				<callerData>
+					<maxDepth>2</maxDepth>
+					<fieldName>caller</fieldName>
+					<classFieldName>class</classFieldName>
+					<methodFieldName>method</methodFieldName>
+					<fileFieldName>file</fileFieldName>
+					<lineFieldName>line</lineFieldName>
+				</callerData>
+				<mdc>
+					<includeMdcKeyName>event</includeMdcKeyName>
+					<includeMdcKeyName>traceId</includeMdcKeyName>
+					<includeMdcKeyName>method</includeMdcKeyName>
+					<includeMdcKeyName>uri</includeMdcKeyName>
+					<includeMdcKeyName>status</includeMdcKeyName>
+					<includeMdcKeyName>processTime</includeMdcKeyName>
+				</mdc>
+			</providers>
+		</encoder>
 	</appender>
-
 	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${LOG_PATH}/app.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
@@ -13,31 +45,39 @@
 			<maxFileSize>10000KB</maxFileSize>
 			<maxHistory>30</maxHistory>
 		</rollingPolicy>
-		<encoder class="ch.qos.logback.classic.encoder.JsonEncoder"/>
+		<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+			<providers>
+				<timestamp/>
+				<logLevel/>
+				<threadName/>
+				<message/>
+				<callerData>
+					<maxDepth>2</maxDepth>
+					<fieldName>caller</fieldName>
+					<classFieldName>class</classFieldName>
+					<methodFieldName>method</methodFieldName>
+					<fileFieldName>file</fileFieldName>
+					<lineFieldName>line</lineFieldName>
+				</callerData>
+				<mdc>
+					<includeMdcKeyName>event</includeMdcKeyName>
+					<includeMdcKeyName>traceId</includeMdcKeyName>
+					<includeMdcKeyName>method</includeMdcKeyName>
+					<includeMdcKeyName>uri</includeMdcKeyName>
+					<includeMdcKeyName>status</includeMdcKeyName>
+					<includeMdcKeyName>processTime</includeMdcKeyName>
+				</mdc>
+			</providers>
+		</encoder>
 	</appender>
-
-	<logger name="com.otis" level="DEBUG" additivity="false">
-		<appender-ref ref="FILE"/>
+	<appender name="ASYNC_ALL" class="ch.qos.logback.classic.AsyncAppender">
+		<queueSize>512</queueSize>
+		<discardingThreshold>0</discardingThreshold>
+		<includeCallerData>true</includeCallerData>
 		<appender-ref ref="CONSOLE"/>
-	</logger>
-
-	<logger name="com.zaxxer.hikari" level="WARN" additivity="false">
 		<appender-ref ref="FILE"/>
-	</logger>
-
-	<logger name="org.springframework.web.servlet" level="WARN" additivity="false">
-		<appender-ref ref="FILE"/>
-	</logger>
-
-	<logger name="org.apache.catalina" level="WARN" additivity="false">
-		<appender-ref ref="FILE"/>
-	</logger>
-
-	<logger name="org.apache.coyote" level="WARN" additivity="false">
-		<appender-ref ref="FILE"/>
-	</logger>
-
+	</appender>
 	<root level="INFO">
-		<appender-ref ref="CONSOLE"/>
+		<appender-ref ref="ASYNC_ALL"/>
 	</root>
 </configuration>

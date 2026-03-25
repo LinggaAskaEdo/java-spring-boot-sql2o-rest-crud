@@ -3,6 +3,7 @@ package com.otis.config;
 import java.io.IOException;
 import java.security.SecureRandom;
 
+import org.slf4j.MDC;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,9 @@ public class TraceIdFilter extends OncePerRequestFilter {
 	private static final SecureRandom RANDOM = new SecureRandom();
 
 	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+	protected void doFilterInternal(HttpServletRequest request,
+			HttpServletResponse response,
+			FilterChain filterChain)
 			throws ServletException, IOException {
 
 		String traceId = request.getHeader("X-Trace-Id");
@@ -29,14 +32,21 @@ public class TraceIdFilter extends OncePerRequestFilter {
 			traceId = generateTraceId();
 		}
 
-		String threadId = String.valueOf(Thread.currentThread().threadId());
-
-		long startTime = System.currentTimeMillis();
-
 		response.setHeader("X-Trace-Id", traceId);
 
-		log.info("START | traceId={} | method={} | uri={} | threadId={}",
-				traceId, request.getMethod(), request.getRequestURI(), threadId);
+		// Use threadId() instead of deprecated getId()
+		String threadId = String.valueOf(Thread.currentThread().threadId());
+		String method = request.getMethod();
+		String uri = request.getRequestURI();
+
+		MDC.put("event", "START");
+		MDC.put("traceId", traceId);
+		MDC.put("method", method);
+		MDC.put("uri", uri);
+		MDC.put("threadId", threadId);
+
+		long startTime = System.currentTimeMillis();
+		log.info("Request started");
 
 		try {
 			filterChain.doFilter(request, response);
@@ -44,15 +54,19 @@ public class TraceIdFilter extends OncePerRequestFilter {
 			long processTime = System.currentTimeMillis() - startTime;
 			int status = response.getStatus();
 
-			log.info("END | traceId={} | method={} | uri={} | status={} | processTime={}ms | threadId={}",
-					traceId, request.getMethod(), request.getRequestURI(), status, processTime, threadId);
+			MDC.put("event", "END");
+			MDC.put("status", String.valueOf(status));
+			MDC.put("processTime", String.valueOf(processTime) + " ms");
+
+			log.info("Request completed");
+
+			MDC.clear();
 		}
 	}
 
 	private String generateTraceId() {
 		long timestamp = System.currentTimeMillis();
 		int random = RANDOM.nextInt(0xFFFFFF);
-
 		return Long.toHexString(timestamp) + Integer.toHexString(random);
 	}
 }
