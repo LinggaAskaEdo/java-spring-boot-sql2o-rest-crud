@@ -21,7 +21,6 @@ import tools.jackson.databind.ObjectMapper;
 @Slf4j
 @Service
 public class ProductService {
-
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 
 	private final ProductRepository productRepository;
