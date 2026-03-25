@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
 import org.sql2o.Connection;
 import org.sql2o.Query;
@@ -18,9 +16,11 @@ import com.opengamma.elsql.ElSqlConfig;
 import com.otis.model.Product;
 import com.otis.preference.ConstantPreference;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Repository
 public class ProductRepository {
-	private static final Logger logger = LogManager.getLogger();
 
 	private final Sql2o sql2o;
 	private final ElSql bundle;
@@ -32,7 +32,7 @@ public class ProductRepository {
 
 	public List<Product> findAll() {
 		String sql = bundle.getSql("GetAllProduct");
-		logger.info("GetAllProduct: {}", sql);
+		log.info("GetAllProduct: {}", sql);
 
 		List<Product> result = null;
 		Map<String, String> colMaps = new HashMap<>();
@@ -43,7 +43,7 @@ public class ProductRepository {
 		try (Connection connection = sql2o.open(); Query query = connection.createQuery(sql)) {
 			result = query.executeAndFetch(Product.class);
 		} catch (Exception e) {
-			logger.error("Error when findAll: ", e);
+			log.error("Error when findAll: ", e);
 		}
 
 		return result;
@@ -51,7 +51,7 @@ public class ProductRepository {
 
 	public List<Product> findByNameContaining(String title) {
 		String sql = bundle.getSql("GetProductByNameContain");
-		logger.info("GetProductByNameContain: {}", sql);
+		log.info("GetProductByNameContain: {}", sql);
 
 		List<Product> result = null;
 		Map<String, String> colMaps = new HashMap<>();
@@ -62,7 +62,7 @@ public class ProductRepository {
 		try (Connection connection = sql2o.open(); Query query = connection.createQuery(sql)) {
 			result = query.addParameter("name", "%" + title + "%").executeAndFetch(Product.class);
 		} catch (Exception e) {
-			logger.error("Error when findByNameContaining: ", e);
+			log.error("Error when findByNameContaining: ", e);
 		}
 
 		return result;
@@ -70,7 +70,7 @@ public class ProductRepository {
 
 	public List<Product> findProductByCompanyID(UUID companyID) {
 		String sql = bundle.getSql("GetProductByCompanyID");
-		logger.info("GetProductByCompanyID: {}", sql);
+		log.info("GetProductByCompanyID: {}", sql);
 
 		List<Product> result = null;
 		Map<String, String> colMaps = new HashMap<>();
@@ -81,7 +81,7 @@ public class ProductRepository {
 		try (Connection connection = sql2o.open(); Query query = connection.createQuery(sql)) {
 			result = query.addParameter("company_id", companyID.toString()).executeAndFetch(Product.class);
 		} catch (Exception e) {
-			logger.error("Error when findProductByCompanyID: ", e);
+			log.error("Error when findProductByCompanyID: ", e);
 		}
 
 		return result;
@@ -89,12 +89,12 @@ public class ProductRepository {
 
 	public List<Map<String, Object>> getReportData() {
 		String sql = bundle.getSql("GetReportData");
-		logger.info("GetReportData: {}", sql);
+		log.info("GetReportData: {}", sql);
 
 		try (Connection connection = sql2o.open(); Query query = connection.createQuery(sql)) {
 			return query.executeAndFetchTable().asList();
 		} catch (Exception e) {
-			logger.error("Error when findProductByCompanyID: ", e);
+			log.error("Error when findProductByCompanyID: ", e);
 		}
 
 		return Collections.emptyList();

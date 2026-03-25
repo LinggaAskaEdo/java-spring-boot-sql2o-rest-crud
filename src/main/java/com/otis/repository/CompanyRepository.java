@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
 import org.sql2o.Connection;
 import org.sql2o.Query;
@@ -16,9 +14,11 @@ import com.opengamma.elsql.ElSqlConfig;
 import com.otis.model.Company;
 import com.otis.preference.ConstantPreference;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Repository
 public class CompanyRepository {
-	private static final Logger logger = LogManager.getLogger();
 
 	private final Sql2o sql2o;
 	private final ElSql bundle;
@@ -30,7 +30,7 @@ public class CompanyRepository {
 
 	public Company getCompanyByName(String name) {
 		String sql = bundle.getSql("GetCompanyByName");
-		logger.info("GetCompanyByName: {}", sql);
+		log.info("GetCompanyByName: {}", sql);
 
 		Company result = null;
 		Map<String, String> colMaps = new HashMap<>();
@@ -41,7 +41,7 @@ public class CompanyRepository {
 		try (Connection connection = sql2o.open(); Query query = connection.createQuery(sql)) {
 			result = query.addParameter("name", name).executeAndFetchFirst(Company.class);
 		} catch (Exception e) {
-			logger.error("Error when getCompanyByName: ", e);
+			log.error("Error when getCompanyByName: ", e);
 		}
 
 		return result;
@@ -49,7 +49,7 @@ public class CompanyRepository {
 
 	public Company findById(UUID id) {
 		String sql = bundle.getSql("GetCompanyById");
-		logger.info("GetCompanyById: {}", sql);
+		log.info("GetCompanyById: {}", sql);
 
 		Company result = null;
 		Map<String, String> colMaps = new HashMap<>();
@@ -60,7 +60,7 @@ public class CompanyRepository {
 		try (Connection connection = sql2o.open(); Query query = connection.createQuery(sql)) {
 			result = query.addParameter("id", id.toString()).executeAndFetchFirst(Company.class);
 		} catch (Exception e) {
-			logger.error("Error when findById: ", e);
+			log.error("Error when findById: ", e);
 		}
 
 		return result;

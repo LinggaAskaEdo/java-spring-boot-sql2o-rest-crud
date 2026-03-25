@@ -164,19 +164,19 @@ java -jar target/java-spring-boot-sql2o-rest-crud-1.0-SNAPSHOT.jar
 
 ## Environment Variables
 
-| Variable           | Default                          | Description        |
-| ------------------ | -------------------------------- | ------------------ |
-| DB_HOST            | localhost                        | Database host      |
-| DB_PORT            | 3306                             | Database port      |
-| DB_NAME            | java-spring-boot-sql2o-rest-crud | Database name      |
-| DB_USERNAME        | root                             | Database username  |
-| DB_PASSWORD        | root                             | Database password  |
-| LOG_PATH           | logs                             | Log directory path |
-| MYSQL_DOCKER_HOST  | localhost                        | MySQL Docker host  |
-| MYSQL_DOCKER_PORT  | 3306                             | MySQL Docker port  |
-| MYSQL_DOCKER_DATABASE | java-spring-boot-sql2o-rest-crud | Database name |
-| MYSQL_DOCKER_USERNAME | root                          | Database username  |
-| MYSQL_DOCKER_PASSWORD |                                | Database password  |
+| Variable              | Default                          | Description        |
+| --------------------- | -------------------------------- | ------------------ |
+| DB_HOST               | localhost                        | Database host      |
+| DB_PORT               | 3306                             | Database port      |
+| DB_NAME               | java-spring-boot-sql2o-rest-crud | Database name      |
+| DB_USERNAME           | root                             | Database username  |
+| DB_PASSWORD           | root                             | Database password  |
+| LOG_PATH              | logs                             | Log directory path |
+| MYSQL_DOCKER_HOST     | localhost                        | MySQL Docker host  |
+| MYSQL_DOCKER_PORT     | 3306                             | MySQL Docker port  |
+| MYSQL_DOCKER_DATABASE | java-spring-boot-sql2o-rest-crud | Database name      |
+| MYSQL_DOCKER_USERNAME | root                             | Database username  |
+| MYSQL_DOCKER_PASSWORD |                                  | Database password  |
 
 ## Key Features
 

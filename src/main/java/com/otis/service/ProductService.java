@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.otis.exception.ResourceNotFoundException;
@@ -17,11 +15,13 @@ import com.otis.model.Response;
 import com.otis.repository.CompanyRepository;
 import com.otis.repository.ProductRepository;
 
+import lombok.extern.slf4j.Slf4j;
 import tools.jackson.databind.ObjectMapper;
 
+@Slf4j
 @Service
 public class ProductService {
-	private static final Logger logger = LogManager.getLogger();
+
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 
 	private final ProductRepository productRepository;
@@ -57,7 +57,7 @@ public class ProductService {
 		List<Map<String, Object>> results = productRepository.getReportData();
 
 		if (!results.isEmpty()) {
-			logger.info("Data is not empty !!!");
+			log.info("Data is not empty !!!");
 			for (Map<String, Object> map : results) {
 				Product product = Product.builder()
 						.id(UUID.fromString(map.get("product_id").toString()))
@@ -96,9 +96,9 @@ public class ProductService {
 			response.setProducts(products);
 
 			String json = objectMapper.writeValueAsString(response);
-			logger.info("Results: {}", json);
+			log.info("Results: {}", json);
 		} else {
-			logger.info("Data is empty !!!");
+			log.info("Data is empty !!!");
 		}
 
 		return response;

@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
 import org.sql2o.Connection;
 import org.sql2o.Query;
@@ -15,9 +13,11 @@ import com.opengamma.elsql.ElSql;
 import com.opengamma.elsql.ElSqlConfig;
 import com.otis.model.Tutorial;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Repository
 public class TutorialRepository {
-	private static final Logger logger = LogManager.getLogger();
 
 	private final Sql2o sql2o;
 	private final ElSql bundle;
@@ -29,14 +29,14 @@ public class TutorialRepository {
 
 	public List<Tutorial> findAll() {
 		String sql = bundle.getSql("GetAllTutorial");
-		logger.info("GetAllTutorial: {}", sql);
+		log.info("GetAllTutorial: {}", sql);
 
 		List<Tutorial> result = null;
 
 		try (Connection connection = sql2o.open(); Query query = connection.createQuery(sql)) {
 			result = query.executeAndFetch(Tutorial.class);
 		} catch (Exception e) {
-			logger.error("Error when findAll: ", e);
+			log.error("Error when findAll: ", e);
 		}
 
 		return result;
@@ -44,14 +44,14 @@ public class TutorialRepository {
 
 	public List<Tutorial> findByTitleContaining(String title) {
 		String sql = bundle.getSql("GetTutorialByTitleContain");
-		logger.info("GetTutorialByTitleContain: {}", sql);
+		log.info("GetTutorialByTitleContain: {}", sql);
 
 		List<Tutorial> result = null;
 
 		try (Connection connection = sql2o.open(); Query query = connection.createQuery(sql)) {
 			result = query.addParameter("title", "%" + title + "%").executeAndFetch(Tutorial.class);
 		} catch (Exception e) {
-			logger.error("Error when findAll: ", e);
+			log.error("Error when findAll: ", e);
 		}
 
 		return result;
@@ -59,7 +59,7 @@ public class TutorialRepository {
 
 	public Optional<Tutorial> findById(UUID id) {
 		String sql = bundle.getSql("GetTutorialById");
-		logger.info("GetTutorialById: {}", sql);
+		log.info("GetTutorialById: {}", sql);
 
 		Optional<Tutorial> result = Optional.empty();
 
@@ -70,7 +70,7 @@ public class TutorialRepository {
 				result = Optional.of(tutorial);
 			}
 		} catch (Exception e) {
-			logger.error("Error when findById: ", e);
+			log.error("Error when findById: ", e);
 		}
 
 		return result;

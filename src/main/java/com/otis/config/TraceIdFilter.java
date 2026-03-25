@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class TraceIdFilter extends OncePerRequestFilter {
-
 	private static final SecureRandom RANDOM = new SecureRandom();
 
 	@Override

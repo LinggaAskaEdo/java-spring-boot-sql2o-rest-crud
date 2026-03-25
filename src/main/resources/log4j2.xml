@@ -1,22 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration>
+<Configuration status="DEBUG">
 	<Properties>
 		<Property name="log-path">${env:LOG_PATH:-logs}</Property>
 	</Properties>
 	<Appenders>
 		<Console name="console" target="SYSTEM_OUT">
 			<JsonLayout compact="true" eventEol="true" properties="false"
-				includeNull="false" removeThreadName="true">
-				<PatternLayout pattern="%msg%n"/>
-			</JsonLayout>
+                        includeNull="false"
+                        includeThreadId="false"
+                        includeThreadPriority="false"
+                        includeThreadName="false"
+                        includeLoggerFqcn="false"
+                        includeEndOfBatch="false"
+                        includeInstant="false"
+                        includeTimeMillis="true"/>
 		</Console>
 		<RollingFile name="app" fileName="${log-path}/app.log"
                      filePattern="${log-path}/app-%d{yyyy-MM-dd}-%i.old.log"
                      ignoreExceptions="false">
 			<JsonLayout compact="true" eventEol="true" properties="false"
-				includeNull="false" removeThreadName="true">
-				<PatternLayout pattern="%msg%n"/>
-			</JsonLayout>
+                        includeNull="false"
+                        includeThreadId="false"
+                        includeThreadPriority="false"
+                        includeThreadName="false"
+                        includeLoggerFqcn="false"
+                        includeEndOfBatch="false"
+                        includeInstant="false"
+                        includeTimeMillis="true"/>
 			<Policies>
 				<TimeBasedTriggeringPolicy interval="1" modulate="true"/>
 				<SizeBasedTriggeringPolicy size="10000 KB"/>
