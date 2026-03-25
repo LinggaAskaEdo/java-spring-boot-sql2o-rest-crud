@@ -15,7 +15,7 @@ A RESTful API application built with Spring Boot 4, Sql2o, Flyway, and MySQL for
 | HikariCP          | (managed) | Connection pooling        |
 | Lombok            | (managed) | Boilerplate reduction     |
 | Jackson           | (managed) | JSON serialization        |
-| Logback          | (managed) | JSON logging with traceId |
+| Logback           | (managed) | JSON logging with traceId |
 
 ## Project Structure
 
@@ -210,6 +210,26 @@ java -jar target/java-spring-boot-sql2o-rest-crud-1.0-SNAPSHOT.jar
   "message": "Resource not found",
   "description": "/api/products/999"
 }
+```
+
+## Log Output Format
+
+### Request Start
+
+```json
+{"timestamp":"2026-03-25T19:17:48.485351932+07:00","level":"INFO","thread_name":"http-nio-6661-exec-2","message":"Request started","caller":{"class":"com.otis.config.TraceIdFilter","method":"doFilterInternal","file":"TraceIdFilter.java","line":49},"traceId":"19d24edf7c5841abf","method":"GET","event":"START","uri":"/api/products"}
+```
+
+### Request End
+
+```json
+{"timestamp":"2026-03-25T19:17:48.841024008+07:00","level":"INFO","thread_name":"http-nio-6661-exec-2","message":"Request completed","caller":{"class":"com.otis.config.TraceIdFilter","method":"doFilterInternal","file":"TraceIdFilter.java","line":61},"traceId":"19d24edf7c5841abf","method":"GET","event":"END","uri":"/api/products","processTime":"355 ms","status":"200"}
+```
+
+### Database Query
+
+```json
+{"timestamp":"2026-03-25T19:17:48.523154262+07:00","level":"INFO","thread_name":"http-nio-6661-exec-2","message":"GetAllProduct: SELECT id, name, company_id FROM products ","caller":{"class":"com.otis.repository.ProductRepository","method":"findAll","file":"ProductRepository.java","line":34},"traceId":"19d24edf7c5841abf","method":"GET","event":"START","uri":"/api/products"}
 ```
 
 ## License
