@@ -1,7 +1,7 @@
 package com.otis.config;
 
 import java.io.IOException;
-import java.util.UUID;
+import java.security.SecureRandom;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,7 +19,9 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class TraceIdFilter extends OncePerRequestFilter {
+
 	private static final Logger log = LogManager.getLogger(TraceIdFilter.class);
+	private static final SecureRandom RANDOM = new SecureRandom();
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -27,7 +29,7 @@ public class TraceIdFilter extends OncePerRequestFilter {
 
 		String traceId = request.getHeader("X-Trace-Id");
 		if (traceId == null || traceId.isBlank()) {
-			traceId = UUID.randomUUID().toString();
+			traceId = generateTraceId();
 		}
 
 		String threadId = ThreadContext.get("threadId");
@@ -55,5 +57,11 @@ public class TraceIdFilter extends OncePerRequestFilter {
 
 			ThreadContext.remove("traceId");
 		}
+	}
+
+	private String generateTraceId() {
+		long timestamp = System.currentTimeMillis();
+		int random = RANDOM.nextInt(0xFFFFFF);
+		return Long.toHexString(timestamp) + Integer.toHexString(random);
 	}
 }
