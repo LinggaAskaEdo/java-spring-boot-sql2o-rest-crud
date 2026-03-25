@@ -19,7 +19,6 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class TraceIdFilter extends OncePerRequestFilter {
-
 	private static final Logger log = LogManager.getLogger(TraceIdFilter.class);
 
 	@Override
@@ -33,7 +32,7 @@ public class TraceIdFilter extends OncePerRequestFilter {
 
 		String threadId = ThreadContext.get("threadId");
 		if (threadId == null) {
-			threadId = String.valueOf(Thread.currentThread().getId());
+			threadId = String.valueOf(Thread.currentThread().threadId());
 			ThreadContext.put("threadId", threadId);
 		}
 
