@@ -15,7 +15,7 @@ A RESTful API application built with Spring Boot 4, Sql2o, Flyway, and MySQL for
 | HikariCP          | (managed) | Connection pooling        |
 | Lombok            | (managed) | Boilerplate reduction     |
 | Jackson           | (managed) | JSON serialization        |
-| Log4j2            | (managed) | JSON logging with traceId |
+| Logback          | (managed) | JSON logging with traceId |
 
 ## Project Structure
 
@@ -50,7 +50,7 @@ src/main/java/com/otis/
 
 src/main/resources/
 ├── application.yaml                    # Application configuration
-├── log4j2.xml                          # Log4j2 JSON configuration
+├── logback-spring.xml                    # Logback JSON configuration
 ├── META-INF/
 │   └── additional-spring-configuration-metadata.json  # Spring config metadata
 ├── db/migration/
