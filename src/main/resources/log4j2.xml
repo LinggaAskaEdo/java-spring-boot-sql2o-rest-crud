@@ -6,15 +6,17 @@
 	<Appenders>
 		<Console name="console" target="SYSTEM_OUT">
 			<JsonLayout compact="true" eventEol="true" properties="false"
-				includeNull="false" removeThreadName="true" 
-				suppressFields="instant,contextMap,endOfBatch,loggerFqcn,threadPriority"/>
+				includeNull="false" removeThreadName="true">
+				<PatternLayout pattern="%msg%n"/>
+			</JsonLayout>
 		</Console>
 		<RollingFile name="app" fileName="${log-path}/app.log"
                      filePattern="${log-path}/app-%d{yyyy-MM-dd}-%i.old.log"
                      ignoreExceptions="false">
 			<JsonLayout compact="true" eventEol="true" properties="false"
-				includeNull="false" removeThreadName="true"
-				suppressFields="instant,contextMap,endOfBatch,loggerFqcn,threadPriority"/>
+				includeNull="false" removeThreadName="true">
+				<PatternLayout pattern="%msg%n"/>
+			</JsonLayout>
 			<Policies>
 				<TimeBasedTriggeringPolicy interval="1" modulate="true"/>
 				<SizeBasedTriggeringPolicy size="10000 KB"/>

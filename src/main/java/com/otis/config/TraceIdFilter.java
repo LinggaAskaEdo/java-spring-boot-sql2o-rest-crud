@@ -5,7 +5,6 @@ import java.security.SecureRandom;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.ThreadContext;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -32,15 +31,10 @@ public class TraceIdFilter extends OncePerRequestFilter {
 			traceId = generateTraceId();
 		}
 
-		String threadId = ThreadContext.get("threadId");
-		if (threadId == null) {
-			threadId = String.valueOf(Thread.currentThread().threadId());
-			ThreadContext.put("threadId", threadId);
-		}
+		String threadId = String.valueOf(Thread.currentThread().threadId());
 
 		long startTime = System.currentTimeMillis();
 
-		ThreadContext.put("traceId", traceId);
 		response.setHeader("X-Trace-Id", traceId);
 
 		log.info("START | traceId={} | method={} | uri={} | threadId={}",
@@ -54,14 +48,13 @@ public class TraceIdFilter extends OncePerRequestFilter {
 
 			log.info("END | traceId={} | method={} | uri={} | status={} | processTime={}ms | threadId={}",
 					traceId, request.getMethod(), request.getRequestURI(), status, processTime, threadId);
-
-			ThreadContext.remove("traceId");
 		}
 	}
 
 	private String generateTraceId() {
 		long timestamp = System.currentTimeMillis();
 		int random = RANDOM.nextInt(0xFFFFFF);
+
 		return Long.toHexString(timestamp) + Integer.toHexString(random);
 	}
 }
