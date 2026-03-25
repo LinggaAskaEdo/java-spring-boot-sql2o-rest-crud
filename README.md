@@ -1,6 +1,6 @@
-# Java Spring Boot SQL2O REST CRUD
+# Java Spring Boot Sql2o REST CRUD
 
-A RESTful API application built with Spring Boot 4, SQL2O, Flyway, and MySQL for managing products, companies, and tutorials.
+A RESTful API application built with Spring Boot 4, Sql2o, Flyway, and MySQL for managing products, companies, and tutorials.
 
 ## Tech Stack
 
@@ -8,7 +8,7 @@ A RESTful API application built with Spring Boot 4, SQL2O, Flyway, and MySQL for
 | ----------------- | --------- | ------------------------- |
 | Java              | 21        | Runtime                   |
 | Spring Boot       | 4.0.4     | Framework                 |
-| SQL2O             | 1.9.1     | Database access layer     |
+| Sql2o             | 1.9.1     | Database access layer     |
 | ElSql             | 1.3       | SQL management            |
 | MySQL Connector/J | 9.6.0     | MySQL driver              |
 | Flyway            | (managed) | Database migration        |
@@ -177,7 +177,7 @@ java -jar target/java-spring-boot-sql2o-rest-crud-1.0-SNAPSHOT.jar
 - **UUID v7**: Time-ordered unique identifiers for all entities
 - **HikariCP**: High-performance connection pooling
 - **Flyway**: Version-controlled database migrations
-- **SQL2O**: Lightweight JDBC wrapper for easy database operations
+- **Sql2o**: Lightweight JDBC wrapper for easy database operations
 - **ElSql**: External SQL file management for clean repository code
 - **JSON Logging**: Structured JSON logs with traceId support
 - **Request Tracing**: X-Trace-Id header for distributed tracing
