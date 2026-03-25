@@ -15,7 +15,9 @@
 	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 			<providers>
-				<timestamp/>
+				<timestamp>
+					<fieldName>timestamp</fieldName>
+				</timestamp>
 				<logLevel/>
 				<threadName/>
 				<message/>
@@ -47,7 +49,9 @@
 		</rollingPolicy>
 		<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 			<providers>
-				<timestamp/>
+				<timestamp>
+					<fieldName>timestamp</fieldName>
+				</timestamp>
 				<logLevel/>
 				<threadName/>
 				<message/>
