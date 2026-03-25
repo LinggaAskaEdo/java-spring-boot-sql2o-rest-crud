@@ -2,6 +2,7 @@ package com.otis.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,14 +28,14 @@ public class TutorialController {
 	}
 
 	@GetMapping("/tutorials")
-	public ResponseEntity<List<Tutorial>> getAllTutorials(
-			@RequestParam(required = false) String title) {
+	public ResponseEntity<List<Tutorial>> getAllTutorials(@RequestParam(required = false) String title) {
 		List<Tutorial> tutorials = new ArrayList<>();
 
 		if (title == null)
 			tutorials.addAll(service.findAll());
 		else
 			tutorials.addAll(service.findByTitleContaining(title));
+
 		if (tutorials.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
@@ -43,10 +44,9 @@ public class TutorialController {
 	}
 
 	@GetMapping("/tutorials/{id}")
-	public ResponseEntity<Tutorial> getTutorialById(@PathVariable("id") long id) {
+	public ResponseEntity<Tutorial> getTutorialById(@PathVariable UUID id) {
 		Tutorial tutorial = service.findById(id)
-				.orElseThrow(
-						() -> new ResourceNotFoundException("Not found Tutorial with id = " + id));
+				.orElseThrow(() -> new ResourceNotFoundException("Not found Tutorial with id = " + id));
 
 		return new ResponseEntity<>(tutorial, HttpStatus.OK);
 	}

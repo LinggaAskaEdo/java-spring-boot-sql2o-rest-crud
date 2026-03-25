@@ -1,2 +1,5 @@
 @NAME(GetCompanyByName)
     SELECT id, name FROM company WHERE name = :name
+
+@NAME(GetCompanyById)
+    SELECT id, name FROM company WHERE id = :id

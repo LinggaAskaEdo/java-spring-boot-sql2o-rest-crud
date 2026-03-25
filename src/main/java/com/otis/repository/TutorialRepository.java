@@ -2,6 +2,7 @@ package com.otis.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -56,14 +57,14 @@ public class TutorialRepository {
 		return result;
 	}
 
-	public Optional<Tutorial> findById(long id) {
+	public Optional<Tutorial> findById(UUID id) {
 		String sql = bundle.getSql("GetTutorialById");
 		logger.info("GetTutorialById: {}", sql);
 
 		Optional<Tutorial> result = Optional.empty();
 
 		try (Connection connection = sql2o.open(); Query query = connection.createQuery(sql)) {
-			Tutorial tutorial = query.addParameter("id", id).executeAndFetchFirst(Tutorial.class);
+			Tutorial tutorial = query.addParameter("id", id.toString()).executeAndFetchFirst(Tutorial.class);
 
 			if (null != tutorial) {
 				result = Optional.of(tutorial);

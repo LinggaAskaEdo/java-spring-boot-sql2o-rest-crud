@@ -1,0 +1,198 @@
+{
+	"info": {
+		"name": "Java Spring Boot SQL2O REST CRUD",
+		"description": "REST API collection for managing products, companies, and tutorials",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:6661"
+		}
+	],
+	"item": [
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "Get all products",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Trace-Id",
+								"value": "{{$guid}}",
+								"description": "Optional trace ID for logging"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products"]
+						},
+						"description": "Get all products"
+					}
+				},
+				{
+					"name": "Get product by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Trace-Id",
+								"value": "{{$guid}}",
+								"description": "Optional trace ID for logging"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/products/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products", "1"]
+						},
+						"description": "Get a product by ID"
+					}
+				},
+				{
+					"name": "Get products by name",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Trace-Id",
+								"value": "{{$guid}}",
+								"description": "Optional trace ID for logging"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/products?name=Product",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products"],
+							"query": [
+								{
+									"key": "name",
+									"value": "Product",
+									"description": "Filter products by name"
+								}
+							]
+						},
+						"description": "Get products filtered by name"
+					}
+				},
+				{
+					"name": "Get products by company name",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Trace-Id",
+								"value": "{{$guid}}",
+								"description": "Optional trace ID for logging"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/products/company?companyName=Company",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products", "company"],
+							"query": [
+								{
+									"key": "companyName",
+									"value": "Company",
+									"description": "Filter products by company name"
+								}
+							]
+						},
+						"description": "Get products by company name"
+					}
+				},
+				{
+					"name": "Get products report",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Trace-Id",
+								"value": "{{$guid}}",
+								"description": "Optional trace ID for logging"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/products/report",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products", "report"]
+						},
+						"description": "Get product-company report data"
+					}
+				}
+			]
+		},
+		{
+			"name": "Tutorials",
+			"item": [
+				{
+					"name": "Get all tutorials",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Trace-Id",
+								"value": "{{$guid}}",
+								"description": "Optional trace ID for logging"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tutorials",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "tutorials"]
+						},
+						"description": "Get all tutorials"
+					}
+				},
+				{
+					"name": "Get tutorial by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Trace-Id",
+								"value": "{{$guid}}",
+								"description": "Optional trace ID for logging"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tutorials/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "tutorials", "1"]
+						},
+						"description": "Get a tutorial by ID"
+					}
+				},
+				{
+					"name": "Get tutorials by title",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Trace-Id",
+								"value": "{{$guid}}",
+								"description": "Optional trace ID for logging"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tutorials?title=Tutorial",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "tutorials"],
+							"query": [
+								{
+									"key": "title",
+									"value": "Tutorial",
+									"description": "Filter tutorials by title"
+								}
+							]
+						},
+						"description": "Get tutorials filtered by title"
+					}
+				}
+			]
+		}
+	]
+}

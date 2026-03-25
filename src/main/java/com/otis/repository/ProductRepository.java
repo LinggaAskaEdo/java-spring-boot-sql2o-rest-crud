@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -67,18 +68,18 @@ public class ProductRepository {
 		return result;
 	}
 
-	public List<Product> findProductByCompanyID(long companyID) {
+	public List<Product> findProductByCompanyID(UUID companyID) {
 		String sql = bundle.getSql("GetProductByCompanyID");
 		logger.info("GetProductByCompanyID: {}", sql);
 
 		List<Product> result = null;
 		Map<String, String> colMaps = new HashMap<>();
-		colMaps.put("company_id", "companyID");
+		colMaps.put(ConstantPreference.COMPANY_ID, ConstantPreference.COMPANYID);
 
 		sql2o.setDefaultColumnMappings(colMaps);
 
 		try (Connection connection = sql2o.open(); Query query = connection.createQuery(sql)) {
-			result = query.addParameter("company_id", companyID).executeAndFetch(Product.class);
+			result = query.addParameter("company_id", companyID.toString()).executeAndFetch(Product.class);
 		} catch (Exception e) {
 			logger.error("Error when findProductByCompanyID: ", e);
 		}

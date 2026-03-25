@@ -2,6 +2,7 @@ package com.otis.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class TutorialService {
 		return repository.findByTitleContaining(title);
 	}
 
-	public Optional<Tutorial> findById(long id) {
+	public Optional<Tutorial> findById(UUID id) {
 		return repository.findById(id);
 	}
 }

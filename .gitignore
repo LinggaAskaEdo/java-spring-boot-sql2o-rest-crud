@@ -1,1 +1,10 @@
 target/
+.idea/
+.vscode/
+*.classpath
+*.project
+*.factorypath
+.settings/
+logs/
+META-INF/
+.DS_Store

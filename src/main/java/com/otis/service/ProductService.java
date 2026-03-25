@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -58,14 +59,13 @@ public class ProductService {
 		if (!results.isEmpty()) {
 			logger.info("Data is not empty !!!");
 			for (Map<String, Object> map : results) {
-				Product product;
-				product = Product.builder()
-						.id(Long.valueOf(map.get("product_id").toString()))
+				Product product = Product.builder()
+						.id(UUID.fromString(map.get("product_id").toString()))
 						.name(map.get("product_name").toString())
 						.build();
 
 				Company company = Company.builder()
-						.id(Long.valueOf(map.get("company_id").toString()))
+						.id(UUID.fromString(map.get("company_id").toString()))
 						.name(map.get("company_name").toString())
 						.build();
 

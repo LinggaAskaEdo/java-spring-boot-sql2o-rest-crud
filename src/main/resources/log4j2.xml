@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
 	<Properties>
-		<Property name="log-path">/var/log/app/java-spring-boot-sql2o-rest-crud/</Property>
+		<Property name="log-path">${env:LOG_PATH:-logs}</Property>
 	</Properties>
 	<Appenders>
 		<Console name="console" target="SYSTEM_OUT">
-			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%T] [%X{requestId}] %level %logger{10} - %msg%n"/>
+			<JsonLayout compact="true" eventEol="true" properties="true"/>
 		</Console>
-		<RollingFile name="java-spring-boot-sql2o-rest-crud" fileName="${log-path}/java-spring-boot-sql2o-rest-crud.log"
-                     filePattern="${log-path}/java-spring-boot-sql2o-rest-crud-%d{yyyy-MM-dd}-%i.old.log">
-			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%T] [%X{requestId}] %level %logger{10} - %msg%n"/>
+		<RollingFile name="app" fileName="${log-path}/app.log"
+                     filePattern="${log-path}/app-%d{yyyy-MM-dd}-%i.old.log"
+                     ignoreExceptions="false">
+			<JsonLayout compact="true" eventEol="true" properties="true"/>
 			<Policies>
 				<TimeBasedTriggeringPolicy interval="1" modulate="true"/>
 				<SizeBasedTriggeringPolicy size="10000 KB"/>
@@ -18,7 +19,10 @@
 	</Appenders>
 	<Loggers>
 		<Logger name="com.otis" level="DEBUG" additivity="false">
-			<AppenderRef ref="java-spring-boot-sql2o-rest-crud"/>
+			<AppenderRef ref="app"/>
 		</Logger>
+		<Root level="INFO">
+			<AppenderRef ref="console"/>
+		</Root>
 	</Loggers>
 </Configuration>

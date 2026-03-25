@@ -2,6 +2,7 @@ package com.otis.repository;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,6 +42,25 @@ public class CompanyRepository {
 			result = query.addParameter("name", name).executeAndFetchFirst(Company.class);
 		} catch (Exception e) {
 			logger.error("Error when getCompanyByName: ", e);
+		}
+
+		return result;
+	}
+
+	public Company findById(UUID id) {
+		String sql = bundle.getSql("GetCompanyById");
+		logger.info("GetCompanyById: {}", sql);
+
+		Company result = null;
+		Map<String, String> colMaps = new HashMap<>();
+		colMaps.put(ConstantPreference.COMPANY_ID, ConstantPreference.COMPANYID);
+
+		sql2o.setDefaultColumnMappings(colMaps);
+
+		try (Connection connection = sql2o.open(); Query query = connection.createQuery(sql)) {
+			result = query.addParameter("id", id.toString()).executeAndFetchFirst(Company.class);
+		} catch (Exception e) {
+			logger.error("Error when findById: ", e);
 		}
 
 		return result;

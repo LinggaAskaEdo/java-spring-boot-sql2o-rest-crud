@@ -1,6 +1,7 @@
 package com.otis.model;
 
 import java.util.Date;
+import java.util.UUID;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TutorialDetails {
-	private Long id;
+	private UUID id;
 	private Date createdOn;
 	private String createdBy;
 	private Tutorial tutorial;
