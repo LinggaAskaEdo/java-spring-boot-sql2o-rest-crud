@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: java-spring-boot-sql2o-rest-crud
+  threads:
+    virtual:
+      enabled: true
   datasource:
     url: jdbc:mysql://${MYSQL_DOCKER_HOST:localhost}:${MYSQL_DOCKER_PORT:3306}/${MYSQL_DOCKER_DATABASE:java-spring-boot-sql2o-rest-crud}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: ${MYSQL_DOCKER_USERNAME:root}

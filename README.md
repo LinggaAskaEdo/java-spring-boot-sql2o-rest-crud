@@ -4,18 +4,19 @@ A RESTful API application built with Spring Boot 4, Sql2o, Flyway, and MySQL for
 
 ## Tech Stack
 
-| Technology        | Version   | Purpose                   |
-| ----------------- | --------- | ------------------------- |
-| Java              | 21        | Runtime                   |
-| Spring Boot       | 4.0.4     | Framework                 |
-| Sql2o             | 1.9.1     | Database access layer     |
-| ElSql             | 1.3       | SQL management            |
-| MySQL Connector/J | 9.6.0     | MySQL driver              |
-| Flyway            | (managed) | Database migration        |
-| HikariCP          | (managed) | Connection pooling        |
-| Lombok            | (managed) | Boilerplate reduction     |
-| Jackson           | (managed) | JSON serialization        |
-| Logback           | (managed) | JSON logging with traceId |
+| Technology        | Version   | Purpose                                    |
+| ----------------- | --------- | ------------------------------------------ |
+| Java              | 21        | Runtime                                    |
+| Spring Boot       | 4.0.4     | Framework                                  |
+| Sql2o             | 1.9.1     | Database access layer                      |
+| ElSql             | 1.3       | SQL management                             |
+| MySQL Connector/J | 9.6.0     | MySQL driver                               |
+| Flyway            | (managed) | Database migration                         |
+| HikariCP          | (managed) | Connection pooling                         |
+| Lombok            | (managed) | Boilerplate reduction                      |
+| Jackson           | (managed) | JSON serialization                         |
+| Logback           | (managed) | JSON logging with traceId                  |
+| Virtual Threads   | Java 21   | Lightweight threading for high scalability |
 
 ## Project Structure
 
@@ -24,7 +25,8 @@ src/main/java/com/otis/
 ├── Application.java                    # Main entry point
 ├── config/
 │   ├── DatabaseConfig.java            # Sql2o configuration
-│   └── TraceIdFilter.java            # Request tracing filter
+│   ├── TraceIdFilter.java            # Request tracing filter
+│   └── VirtualThreadConfig.java      # Jetty virtual thread configuration
 ├── controller/
 │   ├── ProductController.java         # Product REST endpoints
 │   └── TutorialController.java        # Tutorial REST endpoints
@@ -88,7 +90,14 @@ src/main/resources/
 Configure via environment variables or `src/main/resources/application.yaml`:
 
 ```yaml
+server:
+  port: 6661
+
 spring:
+  threads:
+    virtual:
+      enabled: true # Enable Java 21 virtual threads
+
   datasource:
     url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:java-spring-boot-sql2o-rest-crud}?useSSL=false
     username: ${DB_USERNAME:root}
@@ -181,6 +190,7 @@ java -jar target/java-spring-boot-sql2o-rest-crud-1.0-SNAPSHOT.jar
 ## Key Features
 
 - **UUID v7**: Time-ordered unique identifiers for all entities
+- **Virtual Threads**: Java 21 lightweight threads for high scalability
 - **HikariCP**: High-performance connection pooling
 - **Flyway**: Version-controlled database migrations
 - **Sql2o**: Lightweight JDBC wrapper for easy database operations
@@ -217,21 +227,68 @@ java -jar target/java-spring-boot-sql2o-rest-crud-1.0-SNAPSHOT.jar
 ### Request Start
 
 ```json
-{"timestamp":"2026-03-25T19:17:48.485351932+07:00","level":"INFO","thread_name":"http-nio-6661-exec-2","message":"Request started","caller":{"class":"com.otis.config.TraceIdFilter","method":"doFilterInternal","file":"TraceIdFilter.java","line":49},"traceId":"19d24edf7c5841abf","method":"GET","event":"START","uri":"/api/products"}
+{
+  "timestamp": "2026-03-25T19:17:48.485351932+07:00",
+  "level": "INFO",
+  "thread_name": "vt-jetty-1",
+  "message": "Request started",
+  "caller": {
+    "class": "com.otis.config.TraceIdFilter",
+    "method": "doFilterInternal",
+    "file": "TraceIdFilter.java",
+    "line": 49
+  },
+  "traceId": "19d24edf7c5841abf",
+  "method": "GET",
+  "event": "START",
+  "uri": "/api/products"
+}
 ```
 
 ### Request End
 
 ```json
-{"timestamp":"2026-03-25T19:17:48.841024008+07:00","level":"INFO","thread_name":"http-nio-6661-exec-2","message":"Request completed","caller":{"class":"com.otis.config.TraceIdFilter","method":"doFilterInternal","file":"TraceIdFilter.java","line":61},"traceId":"19d24edf7c5841abf","method":"GET","event":"END","uri":"/api/products","processTime":"355 ms","status":"200"}
+{
+  "timestamp": "2026-03-25T19:17:48.841024008+07:00",
+  "level": "INFO",
+  "thread_name": "vt-jetty-1",
+  "message": "Request completed",
+  "caller": {
+    "class": "com.otis.config.TraceIdFilter",
+    "method": "doFilterInternal",
+    "file": "TraceIdFilter.java",
+    "line": 61
+  },
+  "traceId": "19d24edf7c5841abf",
+  "method": "GET",
+  "event": "END",
+  "uri": "/api/products",
+  "processTime": "355 ms",
+  "status": "200"
+}
 ```
 
 ### Database Query
 
 ```json
-{"timestamp":"2026-03-25T19:17:48.523154262+07:00","level":"INFO","thread_name":"http-nio-6661-exec-2","message":"GetAllProduct: SELECT id, name, company_id FROM products ","caller":{"class":"com.otis.repository.ProductRepository","method":"findAll","file":"ProductRepository.java","line":34},"traceId":"19d24edf7c5841abf","method":"GET","event":"START","uri":"/api/products"}
+{
+  "timestamp": "2026-03-25T19:17:48.523154262+07:00",
+  "level": "INFO",
+  "thread_name": "vt-jetty-1",
+  "message": "GetAllProduct: SELECT id, name, company_id FROM products ",
+  "caller": {
+    "class": "com.otis.repository.ProductRepository",
+    "method": "findAll",
+    "file": "ProductRepository.java",
+    "line": 34
+  },
+  "traceId": "19d24edf7c5841abf",
+  "method": "GET",
+  "event": "START",
+  "uri": "/api/products"
+}
 ```
 
 ## License
 
-MIT
+Propriety of Otis
