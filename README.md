@@ -7,7 +7,7 @@ A RESTful API application built with Spring Boot 4, Sql2o, Flyway, and MySQL for
 | Technology        | Version   | Purpose                                    |
 | ----------------- | --------- | ------------------------------------------ |
 | Java              | 21        | Runtime                                    |
-| Spring Boot       | 4.0.4     | Framework                                  |
+| Spring Boot       | 4.0.5     | Framework                                  |
 | Sql2o             | 1.9.1     | Database access layer                      |
 | ElSql             | 1.3       | SQL management                             |
 | MySQL Connector/J | 9.6.0     | MySQL driver                               |

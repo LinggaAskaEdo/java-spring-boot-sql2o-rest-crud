@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.otis</groupId>
 	<artifactId>java-spring-boot-sql2o-rest-crud</artifactId>
-	<version>0.0.1</version>
+	<version>0.1.0</version>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.4</version>
+		<version>4.0.5</version>
 		<relativePath/>
 	</parent>
 	<properties>

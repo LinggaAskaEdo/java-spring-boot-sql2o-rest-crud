@@ -2,7 +2,8 @@
 
 MAVEN := mvn
 APP_NAME := java-spring-boot-sql2o-rest-crud
-JAR_FILE := target/$(APP_NAME)-0.0.1.jar
+VERSION := $(shell grep -oP '(?<=<version>)[^<]+' pom.xml | head -1)
+JAR_FILE := target/$(APP_NAME)-$(VERSION).jar
 FLYWAY_VERSION := 12.1.1
 FLYWAY_PLUGIN := org.flywaydb:flyway-maven-plugin:$(FLYWAY_VERSION)
 FLYWAY_MIGRATION_DIR := src/main/resources/db/migration
