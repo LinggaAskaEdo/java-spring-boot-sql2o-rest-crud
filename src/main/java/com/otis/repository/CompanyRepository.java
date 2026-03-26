@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Repository
 public class CompanyRepository {
-
 	private final Sql2o sql2o;
 	private final ElSql bundle;
 

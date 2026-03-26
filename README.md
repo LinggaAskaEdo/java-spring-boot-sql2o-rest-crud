@@ -24,14 +24,17 @@ A RESTful API application built with Spring Boot 4, Sql2o, Flyway, and MySQL for
 src/main/java/com/otis/
 ├── Application.java                    # Main entry point
 ├── config/
-│   ├── DatabaseConfig.java            # Sql2o configuration
-│   ├── TraceIdFilter.java            # Request tracing filter
+│   ├── DatabaseConfig.java           # Sql2o configuration
+│   ├── DatabaseThrottleConfig.java    # Semaphore-based DB query throttling
+│   ├── LoggingResponseWrapper.java   # Response body capture wrapper
+│   ├── TraceIdFilter.java           # Request tracing filter
 │   └── VirtualThreadConfig.java      # Jetty virtual thread configuration
 ├── controller/
 │   ├── ProductController.java         # Product REST endpoints
 │   └── TutorialController.java        # Tutorial REST endpoints
 ├── exception/
 │   ├── ControllerExceptionHandler.java # Global exception handling
+│   ├── DatabaseThrottleException.java # DB throttle exception
 │   ├── ErrorMessage.java             # Error response model
 │   └── ResourceNotFoundException.java # Custom 404 exception
 ├── model/
@@ -46,6 +49,9 @@ src/main/java/com/otis/
 │   ├── CompanyRepository.java         # Company data access
 │   ├── ProductRepository.java         # Product data access
 │   └── TutorialRepository.java        # Tutorial data access
+├── util/
+│   ├── JsonUtils.java                # ObjectMapper utility
+│   └── RandomUtils.java              # SecureRandom utility
 └── service/
     ├── ProductService.java            # Product business logic
     └── TutorialService.java           # Tutorial business logic
@@ -104,7 +110,8 @@ spring:
     password: ${DB_PASSWORD:root}
     hikari:
       pool-name: HikariPool-1
-      maximum-pool-size: 10
+      maximum-pool-size: 30
+      throttle-percentage: 98 # Semaphore permits = 98% of max pool size
       minimum-idle: 5
       idle-timeout: 300000
       max-lifetime: 1800000
@@ -191,6 +198,7 @@ java -jar target/java-spring-boot-sql2o-rest-crud-1.0-SNAPSHOT.jar
 
 - **UUID v7**: Time-ordered unique identifiers for all entities
 - **Virtual Threads**: Java 21 lightweight threads for high scalability
+- **Database Throttling**: Semaphore-based query limiting (98% of Hikari pool size)
 - **HikariCP**: High-performance connection pooling
 - **Flyway**: Version-controlled database migrations
 - **Sql2o**: Lightweight JDBC wrapper for easy database operations

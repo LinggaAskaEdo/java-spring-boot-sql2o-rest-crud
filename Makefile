@@ -20,7 +20,7 @@ clean: ## Clean service and logs
 	@mvn clean
 	@rm -rf logs/
 
-build: ## Build service (skip tests)
+build:clean ## Build service (skip tests)
 	@mvn package -DskipTests
 
 run: build ## Build and run service

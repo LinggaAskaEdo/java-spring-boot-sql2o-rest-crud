@@ -14,7 +14,8 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       pool-name: HikariPool-1
-      maximum-pool-size: 10
+      maximum-pool-size: 30
+      throttle-percentage: 98
       minimum-idle: 5
       idle-timeout: 300000
       max-lifetime: 1800000
