@@ -1,10 +1,10 @@
 package com.otis.service;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import com.otis.model.PageResponse;
 import com.otis.model.Product;
 import com.otis.repository.ProductRepository;
 import com.otis.util.BulkheadUtils;
@@ -23,8 +23,9 @@ public class ProductService {
 		this.bulkhead = databaseBulkhead;
 	}
 
-	public List<Product> findByFilters(UUID id, String name, UUID companyId, String companyName) {
+	public PageResponse<Product> findByFilters(int page, int size, UUID id, String name, UUID companyId,
+			String companyName) {
 		return BulkheadUtils.withBulkhead(bulkhead,
-				() -> productRepository.findByFilters(id, name, companyId, companyName), "findByFilters");
+				() -> productRepository.findByFilters(page, size, id, name, companyId, companyName), "findByFilters");
 	}
 }

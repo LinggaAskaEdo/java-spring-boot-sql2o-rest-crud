@@ -1,2 +1,5 @@
 @NAME(FindByFilters)
     SELECT id, name FROM company
+
+@NAME(CountByFilters)
+    SELECT COUNT(*) FROM company

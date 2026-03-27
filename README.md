@@ -42,6 +42,7 @@ src/main/java/com/otis/
 │   └── ResourceNotFoundException.java # Custom 404 exception
 ├── model/
 │   ├── Company.java                   # Company entity (UUID v7)
+│   ├── PageResponse.java            # Pagination response wrapper
 │   ├── Product.java                  # Product entity (UUID v7)
 │   ├── Response.java                 # Report response wrapper
 │   ├── Tutorial.java                 # Tutorial entity (UUID v7)
@@ -88,60 +89,75 @@ src/main/resources/
 
 ### Products
 
-| Method | Endpoint | Description |
-| ------ | -------- | ----------- |
-| GET | `/api/products` | Get all products with optional filters |
+| Method | Endpoint        | Description                                  |
+| ------ | --------------- | -------------------------------------------- |
+| GET    | `/api/products` | Get all products with pagination and filters |
 
 **Query Parameters:**
-| Parameter | Type | Description |
-| --------- | ---- | ----------- |
-| `id` | UUID | Filter by product ID |
-| `name` | String | Filter by name (partial match) |
-| `company` | UUID | Filter by company ID |
-| `companyName` | String | Filter by company name (partial match) |
+
+| Parameter     | Type   | Required | Default | Description                            |
+| ------------- | ------ | -------- | ------- | -------------------------------------- |
+| `page`        | int    | No       | 0       | Page number (0-indexed)                |
+| `size`        | int    | No       | 10      | Page size                              |
+| `id`          | UUID   | No       | -       | Filter by product ID                   |
+| `name`        | String | No       | -       | Filter by name (partial match)         |
+| `company`     | UUID   | No       | -       | Filter by company ID                   |
+| `companyName` | String | No       | -       | Filter by company name (partial match) |
 
 **Example:**
+
 ```bash
 GET /api/products
+GET /api/products?page=0&size=10
 GET /api/products?name=Security
 GET /api/products?name=Security&companyName=Singapore
 ```
 
 ### Companies
 
-| Method | Endpoint | Description |
-| ------ | -------- | ----------- |
-| GET | `/api/companies` | Get all companies with optional filters |
+| Method | Endpoint         | Description                                   |
+| ------ | ---------------- | --------------------------------------------- |
+| GET    | `/api/companies` | Get all companies with pagination and filters |
 
 **Query Parameters:**
-| Parameter | Type | Description |
-| --------- | ---- | ----------- |
-| `id` | UUID | Filter by company ID |
-| `name` | String | Filter by name (partial match) |
+
+| Parameter | Type   | Required | Default | Description                    |
+| --------- | ------ | -------- | ------- | ------------------------------ |
+| `page`    | int    | No       | 0       | Page number (0-indexed)        |
+| `size`    | int    | No       | 10      | Page size                      |
+| `id`      | UUID   | No       | -       | Filter by company ID           |
+| `name`    | String | No       | -       | Filter by name (partial match) |
 
 **Example:**
+
 ```bash
 GET /api/companies
+GET /api/companies?page=0&size=5
 GET /api/companies?name=Singapore
 ```
 
 ### Tutorials
 
-| Method | Endpoint | Description |
-| ------ | -------- | ----------- |
-| GET | `/api/tutorials` | Get all tutorials with optional filters |
+| Method | Endpoint         | Description                                   |
+| ------ | ---------------- | --------------------------------------------- |
+| GET    | `/api/tutorials` | Get all tutorials with pagination and filters |
 
 **Query Parameters:**
-| Parameter | Type | Description |
-| --------- | ---- | ----------- |
-| `id` | UUID | Filter by tutorial ID |
-| `title` | String | Filter by title (partial match) |
-| `description` | String | Filter by description (partial match) |
-| `published` | Boolean | Filter by published status |
+
+| Parameter     | Type    | Required | Default | Description                           |
+| ------------- | ------- | -------- | ------- | ------------------------------------- |
+| `page`        | int     | No       | 0       | Page number (0-indexed)               |
+| `size`        | int     | No       | 10      | Page size                             |
+| `id`          | UUID    | No       | -       | Filter by tutorial ID                 |
+| `title`       | String  | No       | -       | Filter by title (partial match)       |
+| `description` | String  | No       | -       | Filter by description (partial match) |
+| `published`   | Boolean | No       | -       | Filter by published status            |
 
 **Example:**
+
 ```bash
 GET /api/tutorials
+GET /api/tutorials?page=1&size=5
 GET /api/tutorials?title=spring&published=true
 ```
 
@@ -287,6 +303,7 @@ java -jar target/java-spring-boot-sql2o-rest-crud-1.0-SNAPSHOT.jar
 - **ElSql**: External SQL file management for clean repository code
 - **Dynamic Queries**: Dynamic WHERE clause building with ElSql base queries
 - **Consolidated Endpoints**: Single endpoint per entity with filter parameters
+- **Pagination**: Built-in pagination support with page/size parameters
 - **Data Seeder**: Scheduled seeding of real data for companies, products, and tutorials
 - **JSON Logging**: Structured JSON logs with traceId support
 - **Request Tracing**: X-Trace-Id header for distributed tracing
@@ -294,6 +311,22 @@ java -jar target/java-spring-boot-sql2o-rest-crud-1.0-SNAPSHOT.jar
 - **Global Exception Handling**: Consistent error responses
 
 ## Response Format
+
+### Paginated Response
+
+All list endpoints return paginated responses:
+
+```json
+{
+  "content": [...],
+  "page": 0,
+  "size": 10,
+  "totalElements": 100,
+  "totalPages": 10,
+  "first": true,
+  "last": false
+}
+```
 
 ### Product Response
 

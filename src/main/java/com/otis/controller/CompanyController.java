@@ -1,9 +1,7 @@
 package com.otis.controller;
 
-import java.util.List;
 import java.util.UUID;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.otis.model.Company;
+import com.otis.model.PageResponse;
 import com.otis.service.CompanyService;
 
 @CrossOrigin(origins = "*")
@@ -25,14 +24,11 @@ public class CompanyController {
 	}
 
 	@GetMapping("/companies")
-	public ResponseEntity<List<Company>> getAllCompanies(
+	public ResponseEntity<PageResponse<Company>> getAllCompanies(
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size,
 			@RequestParam(required = false) UUID id,
 			@RequestParam(required = false) String name) {
-		List<Company> companies = service.findByFilters(id, name);
-		if (companies.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		}
-
-		return new ResponseEntity<>(companies, HttpStatus.OK);
+		return ResponseEntity.ok(service.findByFilters(page, size, id, name));
 	}
 }

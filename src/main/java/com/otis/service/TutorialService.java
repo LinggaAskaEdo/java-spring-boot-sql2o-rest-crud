@@ -1,10 +1,10 @@
 package com.otis.service;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import com.otis.model.PageResponse;
 import com.otis.model.Tutorial;
 import com.otis.repository.TutorialRepository;
 import com.otis.util.BulkheadUtils;
@@ -23,8 +23,9 @@ public class TutorialService {
 		this.bulkhead = databaseBulkhead;
 	}
 
-	public List<Tutorial> findByFilters(UUID id, String title, String description, Boolean published) {
+	public PageResponse<Tutorial> findByFilters(int page, int size, UUID id, String title, String description,
+			Boolean published) {
 		return BulkheadUtils.withBulkhead(bulkhead,
-				() -> repository.findByFilters(id, title, description, published), "findByFilters");
+				() -> repository.findByFilters(page, size, id, title, description, published), "findByFilters");
 	}
 }

@@ -1,9 +1,7 @@
 package com.otis.controller;
 
-import java.util.List;
 import java.util.UUID;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.otis.model.PageResponse;
 import com.otis.model.Product;
 import com.otis.service.ProductService;
 
@@ -25,16 +24,13 @@ public class ProductController {
 	}
 
 	@GetMapping("/products")
-	public ResponseEntity<List<Product>> getAllProducts(
+	public ResponseEntity<PageResponse<Product>> getAllProducts(
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size,
 			@RequestParam(required = false) UUID id,
 			@RequestParam(required = false) String name,
 			@RequestParam(required = false) UUID company,
 			@RequestParam(required = false) String companyName) {
-		List<Product> products = service.findByFilters(id, name, company, companyName);
-		if (products.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		}
-
-		return new ResponseEntity<>(products, HttpStatus.OK);
+		return ResponseEntity.ok(service.findByFilters(page, size, id, name, company, companyName));
 	}
 }

@@ -1,2 +1,5 @@
 @NAME(FindByFilters)
     SELECT id, title, description, published FROM tutorials
+
+@NAME(CountByFilters)
+    SELECT COUNT(*) FROM tutorials
