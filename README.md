@@ -418,6 +418,46 @@ java -jar target/java-spring-boot-sql2o-rest-crud-1.0-SNAPSHOT.jar
 - **Global Exception Handling**: Consistent error responses
 - **Seat Reservation**: Pessimistic locking with FOR UPDATE SKIP LOCKED for deadlock avoidance
 
+## Coding Standards
+
+### Model Classes (Records)
+
+All model classes use Java records for immutability and concise syntax:
+
+```java
+public record Product(UUID id, String name, UUID companyID, String companyName, List<Company> companies) {
+}
+```
+
+### Query Parameter Constants
+
+All SQL parameter names are defined in `ConstantPreference`:
+
+```java
+public static final String ID = "id";
+public static final String NAME = "name";
+public static final String EVENT_ID = "eventId";
+public static final String SIZE = "size";
+// etc.
+```
+
+Usage in repositories:
+```java
+query.addParameter(ConstantPreference.ID, id.toString());
+```
+
+### Try-With-Resources
+
+All database resources (Connection, Query) use try-with-resources for automatic cleanup:
+
+```java
+try (Connection conn = sql2o.open();
+        Query query = conn.createQuery(sql)) {
+    return query.addParameter(ConstantPreference.ID, id.toString())
+            .executeAndFetchFirst(Product.class);
+}
+```
+
 ## Response Format
 
 ### Paginated Response
