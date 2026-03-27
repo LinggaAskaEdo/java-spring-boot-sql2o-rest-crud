@@ -5,19 +5,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.Semaphore;
 
 import org.springframework.stereotype.Service;
 
-import com.otis.exception.DatabaseThrottleException;
 import com.otis.exception.ResourceNotFoundException;
 import com.otis.model.Company;
 import com.otis.model.Product;
 import com.otis.model.Response;
 import com.otis.repository.CompanyRepository;
 import com.otis.repository.ProductRepository;
+import com.otis.util.BulkheadUtils;
 import com.otis.util.JsonUtils;
 
+import io.github.resilience4j.bulkhead.Bulkhead;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -25,65 +25,34 @@ import lombok.extern.slf4j.Slf4j;
 public class ProductService {
 	private final ProductRepository productRepository;
 	private final CompanyRepository companyRepository;
-	private final Semaphore databaseSemaphore;
+	private final Bulkhead bulkhead;
 
 	public ProductService(ProductRepository productRepository, CompanyRepository companyRepository,
-			Semaphore databaseSemaphore) {
+			Bulkhead databaseBulkhead) {
 		this.productRepository = productRepository;
 		this.companyRepository = companyRepository;
-		this.databaseSemaphore = databaseSemaphore;
+		this.bulkhead = databaseBulkhead;
 	}
 
 	public List<Product> findAll() {
-		try {
-			databaseSemaphore.acquire();
-			return productRepository.findAll();
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			throw new DatabaseThrottleException("Interrupted while waiting for database throttle", e);
-		} finally {
-			databaseSemaphore.release();
-		}
+		return BulkheadUtils.withBulkhead(bulkhead, productRepository::findAll, "findAll");
 	}
 
 	public List<Product> findByNameContaining(String title) {
-		try {
-			databaseSemaphore.acquire();
-			return productRepository.findByNameContaining(title);
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			throw new DatabaseThrottleException("Interrupted while waiting for database throttle", e);
-		} finally {
-			databaseSemaphore.release();
-		}
+		return BulkheadUtils.withBulkhead(bulkhead,
+				() -> productRepository.findByNameContaining(title), "findByNameContaining");
 	}
 
 	public List<Product> findByCompanyName(String companyName) {
-		Company company;
+		Company company = BulkheadUtils.withBulkhead(bulkhead,
+				() -> companyRepository.getCompanyByName(companyName), "findByCompanyName");
 
-		try {
-			databaseSemaphore.acquire();
-			company = companyRepository.getCompanyByName(companyName);
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			throw new DatabaseThrottleException("Interrupted while waiting for database throttle", e);
-		} finally {
-			databaseSemaphore.release();
-		}
-
-		if (null == company) {
+		if (company == null) {
 			throw new ResourceNotFoundException("Not found Company with name = " + companyName);
 		}
 
-		try {
-			databaseSemaphore.acquire();
-			return productRepository.findProductByCompanyID(company.getId());
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			throw new DatabaseThrottleException("Interrupted while waiting for database throttle", e);
-		} finally {
-			databaseSemaphore.release();
-		}
+		return BulkheadUtils.withBulkhead(bulkhead,
+				() -> productRepository.findProductByCompanyID(company.getId()), "findByCompanyName");
 	}
 
 	public Response getReportData() {
@@ -105,15 +74,7 @@ public class ProductService {
 	}
 
 	private List<Map<String, Object>> fetchReportData() {
-		try {
-			databaseSemaphore.acquire();
-			return productRepository.getReportData();
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			throw new DatabaseThrottleException("Interrupted while waiting for database throttle", e);
-		} finally {
-			databaseSemaphore.release();
-		}
+		return BulkheadUtils.withBulkhead(bulkhead, productRepository::getReportData, "fetchReportData");
 	}
 
 	private Map<Product, List<Company>> buildResponseMap(List<Map<String, Object>> results) {
@@ -154,6 +115,7 @@ public class ProductService {
 			productKey.setCompanies(data.getValue());
 			products.add(productKey);
 		}
+
 		return products;
 	}
 

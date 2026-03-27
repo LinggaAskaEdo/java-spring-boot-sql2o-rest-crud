@@ -8,6 +8,7 @@ A RESTful API application built with Spring Boot 4, Sql2o, Flyway, and MySQL for
 | ----------------- | --------- | ------------------------------------------ |
 | Java              | 21        | Runtime                                    |
 | Spring Boot       | 4.0.5     | Framework                                  |
+| Resilience4j      | 2.4.0     | Bulkhead for concurrency control           |
 | Sql2o             | 1.9.1     | Database access layer                      |
 | ElSql             | 1.3       | SQL management                             |
 | MySQL Connector/J | 9.6.0     | MySQL driver                               |
@@ -25,7 +26,7 @@ src/main/java/com/otis/
 ├── Application.java                    # Main entry point
 ├── config/
 │   ├── DatabaseConfig.java           # Sql2o configuration
-│   ├── DatabaseThrottleConfig.java    # Semaphore-based DB query throttling
+│   ├── BulkheadConfiguration.java    # Resilience4j bulkhead configuration
 │   ├── LoggingResponseWrapper.java   # Response body capture wrapper
 │   ├── TraceIdFilter.java           # Request tracing filter
 │   └── VirtualThreadConfig.java      # Jetty virtual thread configuration
@@ -33,8 +34,9 @@ src/main/java/com/otis/
 │   ├── ProductController.java         # Product REST endpoints
 │   └── TutorialController.java        # Tutorial REST endpoints
 ├── exception/
+│   ├── BadRequestException.java       # Custom 400 exception
+│   ├── BulkheadFullException.java    # Bulkhead full exception
 │   ├── ControllerExceptionHandler.java # Global exception handling
-│   ├── DatabaseThrottleException.java # DB throttle exception
 │   ├── ErrorMessage.java             # Error response model
 │   └── ResourceNotFoundException.java # Custom 404 exception
 ├── model/
@@ -50,8 +52,10 @@ src/main/java/com/otis/
 │   ├── ProductRepository.java         # Product data access
 │   └── TutorialRepository.java        # Tutorial data access
 ├── util/
-│   ├── JsonUtils.java                # ObjectMapper utility
-│   └── RandomUtils.java              # SecureRandom utility
+│   ├── BulkheadUtils.java            # Bulkhead helper utility
+│   ├── JsonUtils.java               # ObjectMapper utility
+│   ├── RandomUtils.java             # SecureRandom utility
+│   └── UuidUtils.java               # UUID parsing utility
 └── service/
     ├── ProductService.java            # Product business logic
     └── TutorialService.java           # Tutorial business logic
@@ -103,6 +107,7 @@ spring:
   threads:
     virtual:
       enabled: true # Enable Java 21 virtual threads
+      name-prefix: ${VT_NAME_PREFIX:vt-jetty-} # Virtual thread name prefix
 
   datasource:
     url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:java-spring-boot-sql2o-rest-crud}?useSSL=false
@@ -120,6 +125,13 @@ spring:
     enabled: true
     baseline-on-migrate: true
     locations: classpath:db/migration
+
+resilience4j:
+  bulkhead:
+    instances:
+      database:
+        max-concurrent-calls: ${BULKHEAD_MAX_CONCURRENT_CALLS:29}
+        max-wait-duration-ms: ${BULKHEAD_MAX_WAIT_DURATION_MS:0}
 ```
 
 ## Database Setup
@@ -180,25 +192,29 @@ java -jar target/java-spring-boot-sql2o-rest-crud-1.0-SNAPSHOT.jar
 
 ## Environment Variables
 
-| Variable              | Default                          | Description        |
-| --------------------- | -------------------------------- | ------------------ |
-| DB_HOST               | localhost                        | Database host      |
-| DB_PORT               | 3306                             | Database port      |
-| DB_NAME               | java-spring-boot-sql2o-rest-crud | Database name      |
-| DB_USERNAME           | root                             | Database username  |
-| DB_PASSWORD           | root                             | Database password  |
-| LOG_PATH              | logs                             | Log directory path |
-| MYSQL_DOCKER_HOST     | localhost                        | MySQL Docker host  |
-| MYSQL_DOCKER_PORT     | 3306                             | MySQL Docker port  |
-| MYSQL_DOCKER_DATABASE | java-spring-boot-sql2o-rest-crud | Database name      |
-| MYSQL_DOCKER_USERNAME | root                             | Database username  |
-| MYSQL_DOCKER_PASSWORD |                                  | Database password  |
+| Variable                      | Default                          | Description                       |
+| ----------------------------- | -------------------------------- | --------------------------------- |
+| DB_HOST                       | localhost                        | Database host                     |
+| DB_PORT                       | 3306                             | Database port                     |
+| DB_NAME                       | java-spring-boot-sql2o-rest-crud | Database name                     |
+| DB_USERNAME                   | root                             | Database username                 |
+| DB_PASSWORD                   | root                             | Database password                 |
+| LOG_PATH                      | logs                             | Log directory path                |
+| MYSQL_DOCKER_HOST             | localhost                        | MySQL Docker host                 |
+| MYSQL_DOCKER_PORT             | 3306                             | MySQL Docker port                 |
+| MYSQL_DOCKER_DATABASE         | java-spring-boot-sql2o-rest-crud | Database name                     |
+| MYSQL_DOCKER_USERNAME         | root                             | Database username                 |
+| MYSQL_DOCKER_PASSWORD         |                                  | Database password                 |
+| VT_NAME_PREFIX                | vt-jetty-                        | Virtual thread name prefix        |
+| BULKHEAD_MAX_CONCURRENT_CALLS | 29                               | Max concurrent bulkhead calls     |
+| BULKHEAD_MAX_WAIT_DURATION_MS | 0                                | Max wait duration in milliseconds |
 
 ## Key Features
 
 - **UUID v7**: Time-ordered unique identifiers for all entities
+- **UUID Validation**: Returns 400 Bad Request for invalid UUID format
 - **Virtual Threads**: Java 21 lightweight threads for high scalability
-- **Database Throttling**: Semaphore-based query limiting (98% of Hikari pool size)
+- **Resilience4j Bulkhead**: Concurrent database call limiting (29 calls max)
 - **HikariCP**: High-performance connection pooling
 - **Flyway**: Version-controlled database migrations
 - **Sql2o**: Lightweight JDBC wrapper for easy database operations

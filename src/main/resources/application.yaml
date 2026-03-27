@@ -7,6 +7,7 @@ spring:
   threads:
     virtual:
       enabled: true
+      name-prefix: ${VT_NAME_PREFIX:vt-jetty-}
   datasource:
     url: jdbc:mysql://${MYSQL_DOCKER_HOST:localhost}:${MYSQL_DOCKER_PORT:3306}/${MYSQL_DOCKER_DATABASE:java-spring-boot-sql2o-rest-crud}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: ${MYSQL_DOCKER_USERNAME:root}
@@ -31,3 +32,10 @@ spring:
 
 logging:
   config: classpath:logback-spring.xml
+
+resilience4j:
+  bulkhead:
+    instances:
+      database:
+        max-concurrent-calls: 29
+        max-wait-duration: 100ms

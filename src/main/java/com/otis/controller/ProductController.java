@@ -17,6 +17,7 @@ import com.otis.exception.ResourceNotFoundException;
 import com.otis.model.Product;
 import com.otis.model.Response;
 import com.otis.service.ProductService;
+import com.otis.util.UuidUtils;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -45,10 +46,12 @@ public class ProductController {
 	}
 
 	@GetMapping("/products/{id}")
-	public ResponseEntity<Product> getProductById(@PathVariable UUID id) {
+	public ResponseEntity<Product> getProductById(@PathVariable String id) {
+		UUID uuid = UuidUtils.parseUUID(id);
+
 		List<Product> products = service.findAll();
 		Product product = products.stream()
-				.filter(p -> p.getId().equals(id))
+				.filter(p -> p.getId().equals(uuid))
 				.findFirst()
 				.orElseThrow(() -> new ResourceNotFoundException("Not found Product with id = " + id));
 

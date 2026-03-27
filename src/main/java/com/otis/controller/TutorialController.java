@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.otis.exception.ResourceNotFoundException;
 import com.otis.model.Tutorial;
 import com.otis.service.TutorialService;
+import com.otis.util.UuidUtils;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -44,8 +45,10 @@ public class TutorialController {
 	}
 
 	@GetMapping("/tutorials/{id}")
-	public ResponseEntity<Tutorial> getTutorialById(@PathVariable UUID id) {
-		Tutorial tutorial = service.findById(id)
+	public ResponseEntity<Tutorial> getTutorialById(@PathVariable String id) {
+		UUID uuid = UuidUtils.parseUUID(id);
+
+		Tutorial tutorial = service.findById(uuid)
 				.orElseThrow(() -> new ResourceNotFoundException("Not found Tutorial with id = " + id));
 
 		return new ResponseEntity<>(tutorial, HttpStatus.OK);
