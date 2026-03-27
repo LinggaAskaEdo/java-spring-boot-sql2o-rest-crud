@@ -59,12 +59,7 @@ public class SeatService {
 			return null;
 		}
 
-		Reservation reservation = Reservation.builder()
-				.id(reservationId)
-				.eventId(eventId)
-				.customerName(customerName)
-				.seatCount(reserved)
-				.build();
+		Reservation reservation = new Reservation(reservationId, eventId, customerName, reserved);
 
 		reservationRepository.create(reservation);
 
