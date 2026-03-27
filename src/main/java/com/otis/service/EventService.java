@@ -15,31 +15,31 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class EventService {
-    private final EventRepository eventRepository;
-    private final Bulkhead bulkhead;
+	private final EventRepository eventRepository;
+	private final Bulkhead bulkhead;
 
-    public EventService(EventRepository eventRepository, Bulkhead databaseBulkhead) {
-        this.eventRepository = eventRepository;
-        this.bulkhead = databaseBulkhead;
-    }
+	public EventService(EventRepository eventRepository, Bulkhead databaseBulkhead) {
+		this.eventRepository = eventRepository;
+		this.bulkhead = databaseBulkhead;
+	}
 
-    public PageResponse<Event> findByFilters(int page, int size, UUID id, String name, String venue) {
-        return BulkheadUtils.withBulkhead(bulkhead,
-                () -> eventRepository.findByFilters(page, size, id, name, venue), "findByFilters");
-    }
+	public PageResponse<Event> findByFilters(int page, int size, UUID id, String name, String venue) {
+		return BulkheadUtils.withBulkhead(bulkhead,
+				() -> eventRepository.findByFilters(page, size, id, name, venue), "findByFilters");
+	}
 
-    public Event findById(UUID id) {
-        return BulkheadUtils.withBulkhead(bulkhead,
-                () -> eventRepository.findById(id), "findById");
-    }
+	public Event findById(UUID id) {
+		return BulkheadUtils.withBulkhead(bulkhead,
+				() -> eventRepository.findById(id), "findById");
+	}
 
-    public int getAvailableSeats(UUID eventId) {
-        return BulkheadUtils.withBulkhead(bulkhead,
-                () -> eventRepository.countAvailableSeats(eventId), "countAvailableSeats");
-    }
+	public int getAvailableSeats(UUID eventId) {
+		return BulkheadUtils.withBulkhead(bulkhead,
+				() -> eventRepository.countAvailableSeats(eventId), "countAvailableSeats");
+	}
 
-    public int getTotalSeats(UUID eventId) {
-        return BulkheadUtils.withBulkhead(bulkhead,
-                () -> eventRepository.countTotalSeats(eventId), "countTotalSeats");
-    }
+	public int getTotalSeats(UUID eventId) {
+		return BulkheadUtils.withBulkhead(bulkhead,
+				() -> eventRepository.countTotalSeats(eventId), "countTotalSeats");
+	}
 }
