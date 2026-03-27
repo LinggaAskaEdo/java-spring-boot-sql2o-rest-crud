@@ -28,19 +28,22 @@ public class ReservationRepository {
 	public void create(Reservation reservation) {
 		String sql = bundle.getSql("Create");
 		log.info("Create reservation: {}", sql);
+
 		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {
-			query.addParameter("id", reservation.id().toString())
+			query.addParameter(ConstantPreference.ID, reservation.id().toString())
 					.addParameter(ConstantPreference.EVENT_ID, reservation.eventId().toString())
-					.addParameter("customerName", reservation.customerName())
-					.addParameter("seatCount", reservation.seatCount())
+					.addParameter(ConstantPreference.CUSTOMER_NAME, reservation.customerName())
+					.addParameter(ConstantPreference.SEAT_COUNT, reservation.seatCount())
 					.executeUpdate();
 		}
 	}
 
 	public Reservation findById(UUID id) {
 		String sql = bundle.getSql("FindById");
+		log.info("Find bt reservation id: {}", sql);
+
 		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {
-			return query.addParameter("id", id.toString())
+			return query.addParameter(ConstantPreference.ID, id.toString())
 					.executeAndFetchFirst(Reservation.class);
 		}
 	}

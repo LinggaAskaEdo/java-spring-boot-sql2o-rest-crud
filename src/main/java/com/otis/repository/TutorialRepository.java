@@ -66,27 +66,27 @@ public class TutorialRepository {
 			Query countQuery = conn.createQuery(countSql.toString());
 
 			if (id != null) {
-				query.addParameter("id", id.toString());
-				countQuery.addParameter("id", id.toString());
+				query.addParameter(ConstantPreference.ID, id.toString());
+				countQuery.addParameter(ConstantPreference.ID, id.toString());
 			}
 
 			if (title != null && !title.isBlank()) {
-				query.addParameter("title", "%" + title + "%");
-				countQuery.addParameter("title", "%" + title + "%");
+				query.addParameter(ConstantPreference.TITLE, "%" + title + "%");
+				countQuery.addParameter(ConstantPreference.TITLE, "%" + title + "%");
 			}
 
 			if (description != null && !description.isBlank()) {
-				query.addParameter("description", "%" + description + "%");
-				countQuery.addParameter("description", "%" + description + "%");
+				query.addParameter(ConstantPreference.DESCRIPTION, "%" + description + "%");
+				countQuery.addParameter(ConstantPreference.DESCRIPTION, "%" + description + "%");
 			}
 
 			if (published != null) {
-				query.addParameter("published", published);
-				countQuery.addParameter("published", published);
+				query.addParameter(ConstantPreference.PUBLISHED, published);
+				countQuery.addParameter(ConstantPreference.PUBLISHED, published);
 			}
 
-			query.addParameter("size", size);
-			query.addParameter("offset", offset);
+			query.addParameter(ConstantPreference.SIZE, size);
+			query.addParameter(ConstantPreference.OFFSET, offset);
 
 			var tutorials = query.executeAndFetch(Tutorial.class);
 			long totalElements = countQuery.executeAndFetchFirst(Integer.class);

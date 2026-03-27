@@ -45,9 +45,9 @@ public class SeatSeederScheduler {
         String sql = "INSERT INTO events (id, name, venue) VALUES (:id, :name, :venue)";
         try (Connection conn = sql2o.open()) {
             conn.createQuery(sql)
-                    .addParameter("id", eventId.toString())
-                    .addParameter("name", "Tech Conference 2026")
-                    .addParameter("venue", "Convention Center Hall A")
+                    .addParameter(ConstantPreference.ID, eventId.toString())
+                    .addParameter(ConstantPreference.NAME, "Tech Conference 2026")
+                    .addParameter(ConstantPreference.VENUE, "Convention Center Hall A")
                     .executeUpdate();
             System.out.println("Created event: Tech Conference 2026 with ID: " + eventId);
         }
@@ -74,9 +74,9 @@ public class SeatSeederScheduler {
                     UUID seatId = UuidUtils.randomUuidV7();
                     String seatNumber = row + num;
                     conn.createQuery(sql)
-                            .addParameter("id", seatId.toString())
+                            .addParameter(ConstantPreference.ID, seatId.toString())
                             .addParameter(ConstantPreference.EVENT_ID, eventId.toString())
-                            .addParameter("seatNumber", seatNumber)
+                            .addParameter(ConstantPreference.SEAT_NUMBER, seatNumber)
                             .executeUpdate();
                 }
             }

@@ -58,22 +58,22 @@ public class EventRepository {
 				Query countQuery = conn.createQuery(countSql.toString())) {
 
 			if (id != null) {
-				query.addParameter("id", id.toString());
-				countQuery.addParameter("id", id.toString());
+				query.addParameter(ConstantPreference.ID, id.toString());
+				countQuery.addParameter(ConstantPreference.ID, id.toString());
 			}
 
 			if (name != null && !name.isBlank()) {
-				query.addParameter("name", "%" + name + "%");
-				countQuery.addParameter("name", "%" + name + "%");
+				query.addParameter(ConstantPreference.NAME, "%" + name + "%");
+				countQuery.addParameter(ConstantPreference.NAME, "%" + name + "%");
 			}
 
 			if (venue != null && !venue.isBlank()) {
-				query.addParameter("venue", "%" + venue + "%");
-				countQuery.addParameter("venue", "%" + venue + "%");
+				query.addParameter(ConstantPreference.VENUE, "%" + venue + "%");
+				countQuery.addParameter(ConstantPreference.VENUE, "%" + venue + "%");
 			}
 
-			query.addParameter("size", size);
-			query.addParameter("offset", offset);
+			query.addParameter(ConstantPreference.SIZE, size);
+			query.addParameter(ConstantPreference.OFFSET, offset);
 
 			var events = query.executeAndFetch(Event.class);
 			long totalElements = countQuery.executeAndFetchFirst(Integer.class);
@@ -89,7 +89,7 @@ public class EventRepository {
 	public Event findById(UUID id) {
 		String sql = bundle.getSql("FindById");
 		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {
-			return query.addParameter("id", id.toString())
+			return query.addParameter(ConstantPreference.ID, id.toString())
 					.executeAndFetchFirst(Event.class);
 		}
 	}

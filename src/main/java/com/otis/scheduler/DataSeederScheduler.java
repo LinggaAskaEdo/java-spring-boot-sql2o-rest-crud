@@ -16,6 +16,7 @@ import org.sql2o.Sql2o;
 
 import com.opengamma.elsql.ElSql;
 import com.opengamma.elsql.ElSqlConfig;
+import com.otis.preference.ConstantPreference;
 import com.otis.util.RandomUtils;
 import com.otis.util.UuidUtils;
 
@@ -73,8 +74,8 @@ public class DataSeederScheduler {
 			for (int i = 0; i < totalCompanies; i++) {
 				String sql = bundle.getSql("InsertCompany");
 				try (Query query = connection.createQuery(sql)) {
-					query.addParameter("id", UuidUtils.randomUuidV7().toString())
-							.addParameter("name", RandomUtils.randomCompanyName())
+					query.addParameter(ConstantPreference.ID, UuidUtils.randomUuidV7().toString())
+							.addParameter(ConstantPreference.NAME, RandomUtils.randomCompanyName())
 							.executeUpdate();
 				}
 			}
@@ -100,9 +101,9 @@ public class DataSeederScheduler {
 				UUID randomCompanyId = companyIds.get(RandomUtils.randomInt(companyIds.size()));
 				String sql = bundle.getSql("InsertProduct");
 				try (Query query = connection.createQuery(sql)) {
-					query.addParameter("id", UuidUtils.randomUuidV7().toString())
-							.addParameter("name", RandomUtils.randomProductName())
-							.addParameter("companyId", randomCompanyId.toString())
+					query.addParameter(ConstantPreference.ID, UuidUtils.randomUuidV7().toString())
+							.addParameter(ConstantPreference.NAME, RandomUtils.randomProductName())
+							.addParameter(ConstantPreference.COMPANYID, randomCompanyId.toString())
 							.executeUpdate();
 				}
 			}
@@ -138,11 +139,11 @@ public class DataSeederScheduler {
 						if (!insertedRelations.contains(relationKey)) {
 							insertedRelations.add(relationKey);
 							String sql = bundle.getSql("InsertProductsCompany");
-							try (Query query = connection.createQuery(sql)) {
-								query.addParameter("productId", productId.toString())
-										.addParameter("companyId", randomCompanyId.toString())
-										.executeUpdate();
-							}
+						try (Query query = connection.createQuery(sql)) {
+							query.addParameter("productId", productId.toString())
+									.addParameter(ConstantPreference.COMPANYID, randomCompanyId.toString())
+									.executeUpdate();
+						}
 						}
 					}
 				}
@@ -162,10 +163,10 @@ public class DataSeederScheduler {
 			for (int i = 0; i < totalTutorials; i++) {
 				String sql = bundle.getSql("InsertTutorial");
 				try (Query query = connection.createQuery(sql)) {
-					query.addParameter("id", UuidUtils.randomUuidV7().toString())
-							.addParameter("title", RandomUtils.randomTutorialTitle())
-							.addParameter("description", RandomUtils.randomTutorialDescription())
-							.addParameter("published", RandomUtils.randomBoolean())
+					query.addParameter(ConstantPreference.ID, UuidUtils.randomUuidV7().toString())
+							.addParameter(ConstantPreference.TITLE, RandomUtils.randomTutorialTitle())
+							.addParameter(ConstantPreference.DESCRIPTION, RandomUtils.randomTutorialDescription())
+							.addParameter(ConstantPreference.PUBLISHED, RandomUtils.randomBoolean())
 							.executeUpdate();
 				}
 			}

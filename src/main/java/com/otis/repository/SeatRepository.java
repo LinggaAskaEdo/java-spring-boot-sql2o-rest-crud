@@ -40,8 +40,8 @@ public class SeatRepository {
 				Query query = conn.createQuery(sql.toString());
 				Query countQuery = conn.createQuery(countSql)) {
 			query.addParameter(ConstantPreference.EVENT_ID, eventId.toString());
-			query.addParameter("size", size);
-			query.addParameter("offset", offset);
+			query.addParameter(ConstantPreference.SIZE, size);
+			query.addParameter(ConstantPreference.OFFSET, offset);
 
 			countQuery.addParameter(ConstantPreference.EVENT_ID, eventId.toString());
 
@@ -63,7 +63,7 @@ public class SeatRepository {
 		try (Connection conn = sql2o.open()) {
 			return conn.createQuery(sql)
 					.addParameter(ConstantPreference.EVENT_ID, eventId.toString())
-					.addParameter("limit", limit)
+					.addParameter(ConstantPreference.LIMIT, limit)
 					.executeAndFetch(Seat.class);
 		}
 	}
@@ -77,13 +77,13 @@ public class SeatRepository {
 
 			for (UUID seatId : seatIds) {
 				Seat seat = conn.createQuery(lockSql)
-						.addParameter("id", seatId.toString())
+						.addParameter(ConstantPreference.ID, seatId.toString())
 						.executeAndFetchFirst(Seat.class);
 
 				if (seat != null) {
 					int updated = conn.createQuery(updateSql)
-							.addParameter("id", seatId.toString())
-							.addParameter("reservationId", reservationId.toString())
+							.addParameter(ConstantPreference.ID, seatId.toString())
+							.addParameter(ConstantPreference.RESERVATION_ID, reservationId.toString())
 							.executeUpdate()
 							.getResult();
 					reserved += updated;
@@ -103,7 +103,7 @@ public class SeatRepository {
 		log.info("ReleaseSeats: reservationId={}", reservationId);
 		try (Connection conn = sql2o.open()) {
 			int updated = conn.createQuery(sql)
-					.addParameter("reservationId", reservationId.toString())
+					.addParameter(ConstantPreference.RESERVATION_ID, reservationId.toString())
 					.executeUpdate()
 					.getResult();
 
