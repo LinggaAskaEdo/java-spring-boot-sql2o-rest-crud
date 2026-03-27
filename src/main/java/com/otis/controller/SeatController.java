@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.otis.model.dto.ReservationRequest;
 import com.otis.model.entity.PageResponse;
 import com.otis.model.entity.Reservation;
 import com.otis.model.entity.Seat;
@@ -59,8 +60,5 @@ public class SeatController {
 			return ResponseEntity.noContent().build();
 		}
 		return ResponseEntity.notFound().build();
-	}
-
-	public record ReservationRequest(String customerName, int seatCount) {
 	}
 }

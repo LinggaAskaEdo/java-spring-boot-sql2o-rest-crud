@@ -82,6 +82,7 @@ public class SeatRepository {
 
 		try (Connection conn = sql2o.beginTransaction()) {
 			int reserved = 0;
+
 			for (UUID seatId : seatIds) {
 				Seat seat = conn.createQuery(lockSql)
 						.addParameter("id", seatId.toString())
