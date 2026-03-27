@@ -2,6 +2,9 @@
     SELECT id, event_id AS eventId, seat_number AS seatNumber, reserved AS reserved, reservation_id AS reservationId
     FROM seats WHERE event_id = :eventId
 
+@NAME(CountByEventId)
+    SELECT COUNT(*) FROM seats WHERE event_id = :eventId
+
 @NAME(FindAvailableSeats)
     SELECT id, event_id AS eventId, seat_number AS seatNumber, reserved AS reserved, reservation_id AS reservationId
     FROM seats WHERE event_id = :eventId AND reserved = FALSE

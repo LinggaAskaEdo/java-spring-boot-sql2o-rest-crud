@@ -22,44 +22,45 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api")
 public class SeatController {
-    private final SeatService seatService;
+	private final SeatService seatService;
 
-    public SeatController(SeatService seatService) {
-        this.seatService = seatService;
-    }
+	public SeatController(SeatService seatService) {
+		this.seatService = seatService;
+	}
 
-    @GetMapping("/events/{eventId}/seats")
-    public ResponseEntity<PageResponse<Seat>> getSeatsByEvent(
-            @PathVariable UUID eventId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(seatService.findByEventId(page, size, eventId));
-    }
+	@GetMapping("/events/{eventId}/seats")
+	public ResponseEntity<PageResponse<Seat>> getSeatsByEvent(
+			@PathVariable UUID eventId,
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "20") int size) {
+		return ResponseEntity.ok(seatService.findByEventId(page, size, eventId));
+	}
 
-    @PostMapping("/events/{eventId}/reserve")
-    public ResponseEntity<Reservation> reserveSeats(
-            @PathVariable UUID eventId,
-            @RequestBody ReservationRequest request) {
-        log.info("Reserve seats request: eventId={}, customerName={}, seatCount={}",
-                eventId, request.customerName(), request.seatCount());
+	@PostMapping("/events/{eventId}/reserve")
+	public ResponseEntity<Reservation> reserveSeats(
+			@PathVariable UUID eventId,
+			@RequestBody ReservationRequest request) {
+		log.info("Reserve seats request: eventId={}, customerName={}, seatCount={}",
+				eventId, request.customerName(), request.seatCount());
 
-        Reservation reservation = seatService.reserveSeats(eventId, request.customerName(), request.seatCount());
+		Reservation reservation = seatService.reserveSeats(eventId, request.customerName(), request.seatCount());
 
-        if (reservation == null) {
-            return ResponseEntity.badRequest().build();
-        }
+		if (reservation == null) {
+			return ResponseEntity.badRequest().build();
+		}
 
-        return ResponseEntity.ok(reservation);
-    }
+		return ResponseEntity.ok(reservation);
+	}
 
-    @PostMapping("/reservations/{reservationId}/cancel")
-    public ResponseEntity<Void> cancelReservation(@PathVariable UUID reservationId) {
-        boolean released = seatService.cancelReservation(reservationId);
-        if (released) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
-    }
+	@PostMapping("/reservations/{reservationId}/cancel")
+	public ResponseEntity<Void> cancelReservation(@PathVariable UUID reservationId) {
+		boolean released = seatService.cancelReservation(reservationId);
+		if (released) {
+			return ResponseEntity.noContent().build();
+		}
+		return ResponseEntity.notFound().build();
+	}
 
-    public record ReservationRequest(String customerName, int seatCount) {}
+	public record ReservationRequest(String customerName, int seatCount) {
+	}
 }
