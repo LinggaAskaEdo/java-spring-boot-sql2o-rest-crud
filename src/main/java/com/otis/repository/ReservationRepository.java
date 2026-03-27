@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 import org.sql2o.Connection;
+import org.sql2o.Query;
 import org.sql2o.Sql2o;
 
 import com.opengamma.elsql.ElSql;
@@ -27,21 +28,19 @@ public class ReservationRepository {
 	public void create(Reservation reservation) {
 		String sql = bundle.getSql("Create");
 		log.info("Create reservation: {}", sql);
-		try (Connection conn = sql2o.open()) {
-			conn.createQuery(sql)
-					.addParameter("id", reservation.getId().toString())
-					.addParameter(ConstantPreference.EVENT_ID, reservation.getEventId().toString())
-					.addParameter("customerName", reservation.getCustomerName())
-					.addParameter("seatCount", reservation.getSeatCount())
+		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {
+			query.addParameter("id", reservation.id().toString())
+					.addParameter(ConstantPreference.EVENT_ID, reservation.eventId().toString())
+					.addParameter("customerName", reservation.customerName())
+					.addParameter("seatCount", reservation.seatCount())
 					.executeUpdate();
 		}
 	}
 
 	public Reservation findById(UUID id) {
 		String sql = bundle.getSql("FindById");
-		try (Connection conn = sql2o.open()) {
-			return conn.createQuery(sql)
-					.addParameter("id", id.toString())
+		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {
+			return query.addParameter("id", id.toString())
 					.executeAndFetchFirst(Reservation.class);
 		}
 	}
