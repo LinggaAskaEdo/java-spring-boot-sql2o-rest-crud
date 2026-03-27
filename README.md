@@ -442,6 +442,7 @@ public static final String SIZE = "size";
 ```
 
 Usage in repositories:
+
 ```java
 query.addParameter(ConstantPreference.ID, id.toString());
 ```
