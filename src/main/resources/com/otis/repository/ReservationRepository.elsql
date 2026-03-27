@@ -1,0 +1,6 @@
+@NAME(Create)
+    INSERT INTO reservations (id, event_id, customer_name, seat_count)
+    VALUES (:id, :eventId, :customerName, :seatCount)
+
+@NAME(FindById)
+    SELECT id, event_id AS eventId, customer_name AS customerName, seat_count AS seatCount FROM reservations WHERE id = :id

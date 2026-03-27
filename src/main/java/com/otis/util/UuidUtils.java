@@ -21,4 +21,18 @@ public final class UuidUtils {
 	public static UUID randomUuidV7() {
 		return MonotonicUUIDv7.generate();
 	}
+
+	public static UUID bytesToUuid(byte[] bytes) {
+		if (bytes == null) {
+			return null;
+		}
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < bytes.length; i++) {
+			if (i == 4 || i == 6 || i == 8 || i == 10) {
+				sb.append('-');
+			}
+			sb.append(String.format("%02x", bytes[i]));
+		}
+		return UUID.fromString(sb.toString());
+	}
 }

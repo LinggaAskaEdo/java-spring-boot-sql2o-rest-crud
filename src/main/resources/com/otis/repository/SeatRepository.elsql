@@ -1,0 +1,23 @@
+@NAME(FindByEventId)
+    SELECT id, event_id AS eventId, seat_number AS seatNumber, reserved AS reserved, reservation_id AS reservationId
+    FROM seats WHERE event_id = :eventId
+
+@NAME(FindAvailableSeats)
+    SELECT id, event_id AS eventId, seat_number AS seatNumber, reserved AS reserved, reservation_id AS reservationId
+    FROM seats WHERE event_id = :eventId AND reserved = FALSE
+
+@NAME(FindAndLockAvailableSeats)
+    SELECT id, event_id AS eventId, seat_number AS seatNumber, reserved AS reserved, reservation_id AS reservationId
+    FROM seats WHERE event_id = :eventId AND reserved = FALSE
+    ORDER BY seat_number LIMIT :limit FOR UPDATE SKIP LOCKED
+
+@NAME(LockAndReserveSeat)
+    SELECT id, event_id AS eventId, seat_number AS seatNumber, reserved AS reserved, reservation_id AS reservationId
+    FROM seats WHERE id = :id AND reserved = FALSE
+    FOR UPDATE
+
+@NAME(ReserveSeat)
+    UPDATE seats SET reserved = TRUE, reservation_id = :reservationId WHERE id = :id AND reserved = FALSE
+
+@NAME(ReleaseSeats)
+    UPDATE seats SET reserved = FALSE, reservation_id = NULL WHERE reservation_id = :reservationId

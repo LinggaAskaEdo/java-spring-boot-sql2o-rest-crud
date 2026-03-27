@@ -1,0 +1,11 @@
+@NAME(FindByFilters)
+    SELECT id, name, venue FROM events WHERE 1=1
+
+@NAME(FindById)
+    SELECT id, name, venue FROM events WHERE id = :id
+
+@NAME(CountAvailableSeats)
+    SELECT COUNT(*) FROM seats WHERE event_id = :eventId AND reserved = FALSE
+
+@NAME(CountTotalSeats)
+    SELECT COUNT(*) FROM seats WHERE event_id = :eventId
