@@ -22,5 +22,11 @@
 @NAME(ReserveSeat)
     UPDATE seats SET reserved = TRUE, reservation_id = :reservationId WHERE id = :id AND reserved = FALSE
 
+@NAME(LockSeatById)
+    SELECT id FROM seats WHERE id = :id AND reserved = FALSE FOR UPDATE
+
+@NAME(ReserveSeatById)
+    UPDATE seats SET reserved = TRUE, reservation_id = :reservationId WHERE id = :id
+
 @NAME(ReleaseSeats)
     UPDATE seats SET reserved = FALSE, reservation_id = NULL WHERE reservation_id = :reservationId

@@ -67,6 +67,7 @@ public class SeatRepository {
 	public List<Seat> findAndLockAvailableSeats(UUID eventId, int limit) {
 		String sql = bundle.getSql("FindAndLockAvailableSeats");
 		log.info("FindAndLockAvailableSeats: {}", sql);
+
 		try (Connection conn = sql2o.open()) {
 			return conn.createQuery(sql)
 					.addParameter(ConstantPreference.EVENT_ID, eventId.toString())
@@ -76,16 +77,17 @@ public class SeatRepository {
 	}
 
 	public int reserveSeatsInTransaction(List<UUID> seatIds, UUID reservationId) {
+		String lockSql = bundle.getSql("LockSeatById");
+		String updateSql = bundle.getSql("ReserveSeatById");
+
 		try (Connection conn = sql2o.beginTransaction()) {
 			int reserved = 0;
 			for (UUID seatId : seatIds) {
-				String lockSql = "SELECT id FROM seats WHERE id = :id AND reserved = FALSE FOR UPDATE";
 				Seat seat = conn.createQuery(lockSql)
 						.addParameter("id", seatId.toString())
 						.executeAndFetchFirst(Seat.class);
 
 				if (seat != null) {
-					String updateSql = "UPDATE seats SET reserved = TRUE, reservation_id = :reservationId WHERE id = :id";
 					int updated = conn.createQuery(updateSql)
 							.addParameter("id", seatId.toString())
 							.addParameter("reservationId", reservationId.toString())
