@@ -9,4 +9,5 @@ public class ConstantPreference {
 	public static final String COMPANYID = "companyID";
 	public static final String AND = " AND ";
 	public static final String WHERE = " WHERE ";
+	public static final String EVENT_ID = "eventId";
 }

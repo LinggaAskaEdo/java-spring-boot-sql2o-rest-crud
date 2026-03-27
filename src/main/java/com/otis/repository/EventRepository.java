@@ -105,7 +105,7 @@ public class EventRepository {
 	public int countAvailableSeats(UUID eventId) {
 		String sql = bundle.getSql("CountAvailableSeats");
 		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {
-			Integer count = query.addParameter("eventId", eventId.toString())
+			Integer count = query.addParameter(ConstantPreference.EVENT_ID, eventId.toString())
 					.executeAndFetchFirst(Integer.class);
 			return count != null ? count : 0;
 		}
@@ -114,7 +114,7 @@ public class EventRepository {
 	public int countTotalSeats(UUID eventId) {
 		String sql = bundle.getSql("CountTotalSeats");
 		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {
-			Integer count = query.addParameter("eventId", eventId.toString())
+			Integer count = query.addParameter(ConstantPreference.EVENT_ID, eventId.toString())
 					.executeAndFetchFirst(Integer.class);
 			return count != null ? count : 0;
 		}

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.sql2o.Connection;
 import org.sql2o.Sql2o;
 
+import com.otis.preference.ConstantPreference;
 import com.otis.util.UuidUtils;
 
 @Component
@@ -74,7 +75,7 @@ public class SeatSeederScheduler {
                     String seatNumber = row + num;
                     conn.createQuery(sql)
                             .addParameter("id", seatId.toString())
-                            .addParameter("eventId", eventId.toString())
+                            .addParameter(ConstantPreference.EVENT_ID, eventId.toString())
                             .addParameter("seatNumber", seatNumber)
                             .executeUpdate();
                 }

@@ -12,6 +12,7 @@ import com.opengamma.elsql.ElSql;
 import com.opengamma.elsql.ElSqlConfig;
 import com.otis.model.entity.PageResponse;
 import com.otis.model.entity.Seat;
+import com.otis.preference.ConstantPreference;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,11 +39,11 @@ public class SeatRepository {
 		try (Connection conn = sql2o.open();
 				Query query = conn.createQuery(sql.toString());
 				Query countQuery = conn.createQuery(countSql)) {
-			query.addParameter("eventId", eventId.toString());
+			query.addParameter(ConstantPreference.EVENT_ID, eventId.toString());
 			query.addParameter("size", size);
 			query.addParameter("offset", offset);
 
-			countQuery.addParameter("eventId", eventId.toString());
+			countQuery.addParameter(ConstantPreference.EVENT_ID, eventId.toString());
 
 			var seats = query.executeAndFetch(Seat.class);
 			long totalElements = countQuery.executeAndFetchFirst(Integer.class);
@@ -68,7 +69,7 @@ public class SeatRepository {
 		log.info("FindAndLockAvailableSeats: {}", sql);
 		try (Connection conn = sql2o.open()) {
 			return conn.createQuery(sql)
-					.addParameter("eventId", eventId.toString())
+					.addParameter(ConstantPreference.EVENT_ID, eventId.toString())
 					.addParameter("limit", limit)
 					.executeAndFetch(Seat.class);
 		}

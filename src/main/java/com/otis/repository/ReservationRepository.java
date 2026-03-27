@@ -9,6 +9,7 @@ import org.sql2o.Sql2o;
 import com.opengamma.elsql.ElSql;
 import com.opengamma.elsql.ElSqlConfig;
 import com.otis.model.entity.Reservation;
+import com.otis.preference.ConstantPreference;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,7 +30,7 @@ public class ReservationRepository {
         try (Connection conn = sql2o.open()) {
             conn.createQuery(sql)
                     .addParameter("id", reservation.getId().toString())
-                    .addParameter("eventId", reservation.getEventId().toString())
+                    .addParameter(ConstantPreference.EVENT_ID, reservation.getEventId().toString())
                     .addParameter("customerName", reservation.getCustomerName())
                     .addParameter("seatCount", reservation.getSeatCount())
                     .executeUpdate();
