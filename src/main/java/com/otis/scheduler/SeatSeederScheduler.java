@@ -40,7 +40,7 @@ public class SeatSeederScheduler {
     }
 
     private void createEvent() {
-        UUID eventId = UUID.randomUUID();
+        UUID eventId = UuidUtils.randomUuidV7();
         String sql = "INSERT INTO events (id, name, venue) VALUES (:id, :name, :venue)";
         try (Connection conn = sql2o.open()) {
             conn.createQuery(sql)
@@ -70,7 +70,7 @@ public class SeatSeederScheduler {
         try (Connection conn = sql2o.open()) {
             for (String row : rows) {
                 for (int num = 1; num <= 10; num++) {
-                    UUID seatId = UUID.randomUUID();
+                    UUID seatId = UuidUtils.randomUuidV7();
                     String seatNumber = row + num;
                     conn.createQuery(sql)
                             .addParameter("id", seatId.toString())

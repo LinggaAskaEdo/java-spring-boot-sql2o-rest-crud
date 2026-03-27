@@ -11,6 +11,7 @@ import com.otis.model.entity.Seat;
 import com.otis.repository.ReservationRepository;
 import com.otis.repository.SeatRepository;
 import com.otis.util.BulkheadUtils;
+import com.otis.util.UuidUtils;
 
 import io.github.resilience4j.bulkhead.Bulkhead;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,7 @@ public class SeatService {
 	}
 
 	private Reservation reserveSeatsInternal(UUID eventId, String customerName, int seatCount) {
-		UUID reservationId = UUID.randomUUID();
+		UUID reservationId = UuidUtils.randomUuidV7();
 
 		List<Seat> lockedSeats = seatRepository.findAndLockAvailableSeats(eventId, seatCount);
 
