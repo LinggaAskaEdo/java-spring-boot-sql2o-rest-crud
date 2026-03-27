@@ -95,15 +95,7 @@ public class ProductRepository {
 			boolean isFirst = page == 0;
 			boolean isLast = page >= totalPages - 1;
 
-			return PageResponse.<Product>builder()
-					.content(products)
-					.page(page)
-					.size(size)
-					.totalElements(totalElements)
-					.totalPages(totalPages)
-					.first(isFirst)
-					.last(isLast)
-					.build();
+			return new PageResponse<>(products, page, size, totalElements, totalPages, isFirst, isLast);
 		}
 	}
 }

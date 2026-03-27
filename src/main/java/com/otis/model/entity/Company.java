@@ -1,6 +1,6 @@
 package com.otis.model.entity;
 
-import java.util.List;
+import java.util.UUID;
 
 public record Company(UUID id, String name) {
 }

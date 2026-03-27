@@ -82,15 +82,7 @@ public class EventRepository {
 			boolean isFirst = page == 0;
 			boolean isLast = page >= totalPages - 1;
 
-			return PageResponse.<Event>builder()
-					.content(events)
-					.page(page)
-					.size(size)
-					.totalElements(totalElements)
-					.totalPages(totalPages)
-					.first(isFirst)
-					.last(isLast)
-					.build();
+			return new PageResponse<>(events, page, size, totalElements, totalPages, isFirst, isLast);
 		}
 	}
 

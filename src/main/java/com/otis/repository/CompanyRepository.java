@@ -72,15 +72,7 @@ public class CompanyRepository {
 			boolean isFirst = page == 0;
 			boolean isLast = page >= totalPages - 1;
 
-			return PageResponse.<Company>builder()
-					.content(companies)
-					.page(page)
-					.size(size)
-					.totalElements(totalElements)
-					.totalPages(totalPages)
-					.first(isFirst)
-					.last(isLast)
-					.build();
+			return new PageResponse<>(companies, page, size, totalElements, totalPages, isFirst, isLast);
 		}
 	}
 }

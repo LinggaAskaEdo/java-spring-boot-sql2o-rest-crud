@@ -52,15 +52,7 @@ public class SeatRepository {
 			boolean isFirst = page == 0;
 			boolean isLast = page >= totalPages - 1;
 
-			return PageResponse.<Seat>builder()
-					.content(seats)
-					.page(page)
-					.size(size)
-					.totalElements(totalElements)
-					.totalPages(totalPages)
-					.first(isFirst)
-					.last(isLast)
-					.build();
+			return new PageResponse<>(seats, page, size, totalElements, totalPages, isFirst, isLast);
 		}
 	}
 
