@@ -182,21 +182,21 @@ GET /api/tutorials?title=spring&published=true
 
 ### Events
 
-| Method | Endpoint           | Description                              |
-| ------ | ------------------ | ---------------------------------------- |
-| GET    | `/api/events`      | Get all events with pagination/filters   |
-| GET    | `/api/events/{id}` | Get event by ID                          |
-| GET    | `/api/events/{id}/seats/available` | Get available seats count |
+| Method | Endpoint                           | Description                            |
+| ------ | ---------------------------------- | -------------------------------------- |
+| GET    | `/api/events`                      | Get all events with pagination/filters |
+| GET    | `/api/events/{id}`                 | Get event by ID                        |
+| GET    | `/api/events/{id}/seats/available` | Get available seats count              |
 
 **Query Parameters (GET /api/events):**
 
-| Parameter | Type   | Required | Default | Description                    |
-| --------- | ------ | -------- | ------- | ------------------------------ |
-| `page`    | int    | No       | 0       | Page number (0-indexed)        |
-| `size`    | int    | No       | 10      | Page size                      |
-| `id`      | UUID   | No       | -       | Filter by event ID             |
-| `name`    | String | No       | -       | Filter by name (partial match) |
-| `venue`   | String | No       | -       | Filter by venue (partial match)|
+| Parameter | Type   | Required | Default | Description                     |
+| --------- | ------ | -------- | ------- | ------------------------------- |
+| `page`    | int    | No       | 0       | Page number (0-indexed)         |
+| `size`    | int    | No       | 10      | Page size                       |
+| `id`      | UUID   | No       | -       | Filter by event ID              |
+| `name`    | String | No       | -       | Filter by name (partial match)  |
+| `venue`   | String | No       | -       | Filter by venue (partial match) |
 
 **Example:**
 
@@ -208,18 +208,18 @@ GET /api/events/019d2d72-eee3-7b29-9af2-f15d04e4b6d8/seats/available
 
 ### Seats & Reservations
 
-| Method | Endpoint                                | Description                    |
-| ------ | --------------------------------------- | ------------------------------ |
-| GET    | `/api/events/{eventId}/seats`           | Get seats for an event         |
-| POST   | `/api/events/{eventId}/reserve`         | Reserve seats                  |
-| POST   | `/api/reservations/{reservationId}/cancel` | Cancel reservation         |
+| Method | Endpoint                                   | Description            |
+| ------ | ------------------------------------------ | ---------------------- |
+| GET    | `/api/events/{eventId}/seats`              | Get seats for an event |
+| POST   | `/api/events/{eventId}/reserve`            | Reserve seats          |
+| POST   | `/api/reservations/{reservationId}/cancel` | Cancel reservation     |
 
 **Query Parameters (GET /api/events/{eventId}/seats):**
 
-| Parameter | Type | Required | Default | Description                |
-| --------- | ---- | -------- | ------- | -------------------------- |
-| `page`    | int  | No       | 0       | Page number (0-indexed)    |
-| `size`    | int  | No       | 20      | Page size                  |
+| Parameter | Type | Required | Default | Description             |
+| --------- | ---- | -------- | ------- | ----------------------- |
+| `page`    | int  | No       | 0       | Page number (0-indexed) |
+| `size`    | int  | No       | 20      | Page size               |
 
 **Reserve Seats Request:**
 
@@ -391,9 +391,9 @@ java -jar target/java-spring-boot-sql2o-rest-crud-1.0-SNAPSHOT.jar
 | BULKHEAD_MAX_CONCURRENT_CALLS         | 29                               | Max concurrent bulkhead calls |
 | BULKHEAD_MAX_WAIT_DURATION            | 100ms                            | Max wait duration             |
 | DATA_SEEDER_ENABLED                   | false                            | Enable data seeder scheduler  |
-| DATA_SEEDER_CRON                      | 0 * * * * ?                      | Data seeder cron expression   |
+| DATA_SEEDER_CRON                      | 0 \* \* \* \* ?                  | Data seeder cron expression   |
 | DATA_SEEDER_TOTAL_COMPANIES           | 10                               | Total companies to seed       |
-| DATA_SEEDER_TOTAL_PRODUCTS           | 15                               | Total products to seed        |
+| DATA_SEEDER_TOTAL_PRODUCTS            | 15                               | Total products to seed        |
 | DATA_SEEDER_TOTAL_TUTORIALS           | 10                               | Total tutorials to seed       |
 | DATA_SEEDER_MAX_COMPANIES_PER_PRODUCT | 3                                | Max companies per product     |
 | SEAT_SEEDER_ENABLED                   | true                             | Enable seat seeder            |
