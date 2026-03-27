@@ -4,8 +4,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.otis.model.Event;
-import com.otis.model.PageResponse;
+import com.otis.model.entity.Event;
+import com.otis.model.entity.PageResponse;
 import com.otis.repository.EventRepository;
 import com.otis.util.BulkheadUtils;
 

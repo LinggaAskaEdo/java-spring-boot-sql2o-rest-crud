@@ -1,4 +1,4 @@
-package com.otis.model;
+package com.otis.model.entity;
 
 import java.util.UUID;
 

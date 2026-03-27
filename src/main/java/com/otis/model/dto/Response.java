@@ -1,6 +1,8 @@
-package com.otis.model;
+package com.otis.model.dto;
 
 import java.util.List;
+
+import com.otis.model.entity.Product;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

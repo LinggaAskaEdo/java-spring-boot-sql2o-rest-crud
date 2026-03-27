@@ -1,6 +1,5 @@
-package com.otis.model;
+package com.otis.model.entity;
 
-import java.util.List;
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
@@ -17,10 +16,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(cacheStrategy = CacheStrategy.LAZY)
-public class Product {
+public class Company {
 	private UUID id;
 	private String name;
-	private UUID companyID;
-	private String companyName;
-	private List<Company> companies;
 }

@@ -4,8 +4,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.otis.model.PageResponse;
-import com.otis.model.Product;
+import com.otis.model.entity.PageResponse;
+import com.otis.model.entity.Product;
 import com.otis.repository.ProductRepository;
 import com.otis.util.BulkheadUtils;
 

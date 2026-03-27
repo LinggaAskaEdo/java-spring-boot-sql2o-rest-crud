@@ -5,9 +5,9 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.otis.model.PageResponse;
-import com.otis.model.Reservation;
-import com.otis.model.Seat;
+import com.otis.model.entity.PageResponse;
+import com.otis.model.entity.Reservation;
+import com.otis.model.entity.Seat;
 import com.otis.repository.ReservationRepository;
 import com.otis.repository.SeatRepository;
 import com.otis.util.BulkheadUtils;

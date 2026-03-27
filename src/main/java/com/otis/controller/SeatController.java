@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.otis.model.PageResponse;
-import com.otis.model.Reservation;
-import com.otis.model.Seat;
+import com.otis.model.entity.PageResponse;
+import com.otis.model.entity.Reservation;
+import com.otis.model.entity.Seat;
 import com.otis.service.SeatService;
 
 import lombok.extern.slf4j.Slf4j;

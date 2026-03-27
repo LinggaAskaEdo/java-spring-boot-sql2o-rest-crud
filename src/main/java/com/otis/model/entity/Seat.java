@@ -1,4 +1,4 @@
-package com.otis.model;
+package com.otis.model.entity;
 
 import java.util.UUID;
 
@@ -16,7 +16,10 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(cacheStrategy = CacheStrategy.LAZY)
-public class Company {
-	private UUID id;
-	private String name;
+public class Seat {
+    private UUID id;
+    private UUID eventId;
+    private String seatNumber;
+    private Boolean reserved;
+    private UUID reservationId;
 }

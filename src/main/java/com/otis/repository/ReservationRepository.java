@@ -8,7 +8,7 @@ import org.sql2o.Sql2o;
 
 import com.opengamma.elsql.ElSql;
 import com.opengamma.elsql.ElSqlConfig;
-import com.otis.model.Reservation;
+import com.otis.model.entity.Reservation;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.otis.model.Event;
-import com.otis.model.PageResponse;
+import com.otis.model.dto.SeatAvailability;
+import com.otis.model.entity.Event;
+import com.otis.model.entity.PageResponse;
 import com.otis.service.EventService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -51,8 +52,5 @@ public class EventController {
 		int total = eventService.getTotalSeats(id);
 
 		return ResponseEntity.ok(new SeatAvailability(total, available));
-	}
-
-	public record SeatAvailability(int total, int available) {
 	}
 }

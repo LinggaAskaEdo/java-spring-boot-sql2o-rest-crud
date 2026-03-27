@@ -9,8 +9,8 @@ import org.sql2o.Sql2o;
 
 import com.opengamma.elsql.ElSql;
 import com.opengamma.elsql.ElSqlConfig;
-import com.otis.model.Company;
-import com.otis.model.PageResponse;
+import com.otis.model.entity.Company;
+import com.otis.model.entity.PageResponse;
 import com.otis.preference.ConstantPreference;
 
 import lombok.extern.slf4j.Slf4j;

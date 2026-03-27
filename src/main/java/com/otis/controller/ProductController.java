@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.otis.model.PageResponse;
-import com.otis.model.Product;
+import com.otis.model.entity.PageResponse;
+import com.otis.model.entity.Product;
 import com.otis.service.ProductService;
 
 @CrossOrigin(origins = "*")

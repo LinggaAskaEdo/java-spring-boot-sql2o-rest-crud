@@ -9,8 +9,8 @@ import org.sql2o.Sql2o;
 
 import com.opengamma.elsql.ElSql;
 import com.opengamma.elsql.ElSqlConfig;
-import com.otis.model.Event;
-import com.otis.model.PageResponse;
+import com.otis.model.entity.Event;
+import com.otis.model.entity.PageResponse;
 import com.otis.preference.ConstantPreference;
 
 import lombok.extern.slf4j.Slf4j;
@@ -96,8 +96,7 @@ public class EventRepository {
 
 	public Event findById(UUID id) {
 		String sql = bundle.getSql("FindById");
-		try (Connection conn = sql2o.open();
-				Query query = conn.createQuery(sql)) {
+		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {
 			return query.addParameter("id", id.toString())
 					.executeAndFetchFirst(Event.class);
 		}
@@ -105,8 +104,7 @@ public class EventRepository {
 
 	public int countAvailableSeats(UUID eventId) {
 		String sql = bundle.getSql("CountAvailableSeats");
-		try (Connection conn = sql2o.open();
-				Query query = conn.createQuery(sql)) {
+		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {
 			Integer count = query.addParameter("eventId", eventId.toString())
 					.executeAndFetchFirst(Integer.class);
 			return count != null ? count : 0;
@@ -115,8 +113,7 @@ public class EventRepository {
 
 	public int countTotalSeats(UUID eventId) {
 		String sql = bundle.getSql("CountTotalSeats");
-		try (Connection conn = sql2o.open();
-				Query query = conn.createQuery(sql)) {
+		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {
 			Integer count = query.addParameter("eventId", eventId.toString())
 					.executeAndFetchFirst(Integer.class);
 			return count != null ? count : 0;
