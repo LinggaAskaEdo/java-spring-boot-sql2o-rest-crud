@@ -1,6 +1,6 @@
 # Java Spring Boot Sql2o REST CRUD
 
-A RESTful API application built with Spring Boot 4, Sql2o, Flyway, and MySQL for managing products, companies, and tutorials.
+A RESTful API application built with Spring Boot 4, Sql2o, Flyway, and MySQL for managing products, companies, tutorials, and seat reservations.
 
 ## Tech Stack
 
@@ -26,48 +26,63 @@ src/main/java/com/otis/
 ├── Application.java                    # Main entry point
 ├── config/
 │   ├── DatabaseConfig.java           # Sql2o configuration
-│   ├── BulkheadConfiguration.java    # Resilience4j bulkhead configuration
-│   ├── LoggingResponseWrapper.java   # Response body capture wrapper
-│   ├── TraceIdFilter.java           # Request tracing filter
-│   └── VirtualThreadConfig.java      # Jetty virtual thread configuration
+│   ├── BulkheadConfig.java            # Resilience4j bulkhead configuration
+│   ├── LoggingResponseWrapper.java    # Response body capture wrapper
+│   ├── TraceIdFilter.java             # Request tracing filter
+│   └── VirtualThreadConfig.java        # Jetty virtual thread configuration
 ├── controller/
 │   ├── CompanyController.java         # Company REST endpoints
+│   ├── EventController.java           # Event REST endpoints
 │   ├── ProductController.java         # Product REST endpoints
+│   ├── SeatController.java            # Seat & Reservation REST endpoints
 │   └── TutorialController.java        # Tutorial REST endpoints
 ├── exception/
 │   ├── BadRequestException.java       # Custom 400 exception
-│   ├── BulkheadFullException.java    # Bulkhead full exception
+│   ├── BulkheadFullException.java     # Bulkhead full exception
 │   ├── ControllerExceptionHandler.java # Global exception handling
-│   ├── ErrorMessage.java             # Error response model
+│   ├── ErrorMessage.java              # Error response model
 │   └── ResourceNotFoundException.java # Custom 404 exception
 ├── model/
-│   ├── Company.java                   # Company entity (UUID v7)
-│   ├── PageResponse.java            # Pagination response wrapper
-│   ├── Product.java                  # Product entity (UUID v7)
-│   ├── Response.java                 # Report response wrapper
-│   ├── Tutorial.java                 # Tutorial entity (UUID v7)
-│   └── TutorialDetails.java          # Tutorial details entity (UUID v7)
+│   ├── dto/
+│   │   ├── ReservationRequest.java    # Reservation request DTO
+│   │   ├── Response.java             # Report response wrapper
+│   │   └── SeatAvailability.java     # Seat availability DTO
+│   └── entity/
+│       ├── Company.java               # Company entity
+│       ├── Event.java                 # Event entity
+│       ├── PageResponse.java          # Pagination response wrapper
+│       ├── Product.java               # Product entity
+│       ├── Reservation.java           # Reservation entity
+│       ├── Seat.java                  # Seat entity
+│       ├── Tutorial.java              # Tutorial entity
+│       └── TutorialDetails.java       # Tutorial details entity
 ├── preference/
 │   └── ConstantPreference.java        # Column mapping constants
 ├── repository/
 │   ├── CompanyRepository.java         # Company data access
+│   ├── EventRepository.java           # Event data access
 │   ├── ProductRepository.java         # Product data access
+│   ├── ReservationRepository.java     # Reservation data access
+│   ├── SeatRepository.java            # Seat data access
 │   └── TutorialRepository.java        # Tutorial data access
 ├── scheduler/
-│   └── DataSeederScheduler.java       # Data seeding scheduler
+│   ├── DataSeederScheduler.java       # Data seeding scheduler
+│   └── SeatSeederScheduler.java       # Seat test data seeder
 ├── util/
 │   ├── BulkheadUtils.java            # Bulkhead helper utility
-│   ├── JsonUtils.java               # ObjectMapper utility
-│   ├── RandomUtils.java             # Random data generator utility
-│   └── UuidUtils.java               # UUID parsing utility
+│   ├── JsonUtils.java                # ObjectMapper utility
+│   ├── RandomUtils.java              # Random data generator utility
+│   └── UuidUtils.java                # UUID parsing utility
 └── service/
-    ├── CompanyService.java          # Company business logic
+    ├── CompanyService.java            # Company business logic
+    ├── EventService.java              # Event business logic
     ├── ProductService.java            # Product business logic
+    ├── SeatService.java               # Seat business logic
     └── TutorialService.java           # Tutorial business logic
 
 src/main/resources/
-├── application.yaml                    # Application configuration
-├── logback-spring.xml                    # Logback JSON configuration
+├── application.yaml                   # Application configuration
+├── logback-spring.xml                 # Logback JSON configuration
 ├── META-INF/
 │   └── additional-spring-configuration-metadata.json  # Spring config metadata
 ├── db/migration/
@@ -75,14 +90,18 @@ src/main/resources/
 │   ├── V20260325130854__create_table_products.sql      # Products table
 │   ├── V20260325130933__create_table_products_company.sql # Product-Company relation
 │   ├── V20260325131006__create_table_tutorials.sql      # Tutorials table
-│   └── V20260325131038__create_table_tutorial_details.sql # Tutorial details table
+│   ├── V20260325131038__create_table_tutorial_details.sql # Tutorial details table
+│   ├── V20260327170000__create_table_events.sql         # Events table
+│   ├── V20260327170001__create_table_seats.sql          # Seats table
+│   └── V20260327170002__create_table_reservations.sql  # Reservations table
 └── com/otis/
-    ├── repository/
-    │   ├── CompanyRepository.elsql         # Company SQL queries
-    │   ├── ProductRepository.elsql        # Product SQL queries
-    │   └── TutorialRepository.elsql       # Tutorial SQL queries
-    └── scheduler/
-        └── DataSeederScheduler.elsql      # Data seeder SQL queries
+    └── repository/
+        ├── CompanyRepository.elsql         # Company SQL queries
+        ├── EventRepository.elsql           # Event SQL queries
+        ├── ProductRepository.elsql        # Product SQL queries
+        ├── ReservationRepository.elsql     # Reservation SQL queries
+        ├── SeatRepository.elsql            # Seat SQL queries
+        └── TutorialRepository.elsql        # Tutorial SQL queries
 ```
 
 ## API Endpoints
@@ -161,6 +180,91 @@ GET /api/tutorials?page=1&size=5
 GET /api/tutorials?title=spring&published=true
 ```
 
+### Events
+
+| Method | Endpoint           | Description                              |
+| ------ | ------------------ | ---------------------------------------- |
+| GET    | `/api/events`      | Get all events with pagination/filters   |
+| GET    | `/api/events/{id}` | Get event by ID                          |
+| GET    | `/api/events/{id}/seats/available` | Get available seats count |
+
+**Query Parameters (GET /api/events):**
+
+| Parameter | Type   | Required | Default | Description                    |
+| --------- | ------ | -------- | ------- | ------------------------------ |
+| `page`    | int    | No       | 0       | Page number (0-indexed)        |
+| `size`    | int    | No       | 10      | Page size                      |
+| `id`      | UUID   | No       | -       | Filter by event ID             |
+| `name`    | String | No       | -       | Filter by name (partial match) |
+| `venue`   | String | No       | -       | Filter by venue (partial match)|
+
+**Example:**
+
+```bash
+GET /api/events
+GET /api/events/019d2d72-eee3-7b29-9af2-f15d04e4b6d8
+GET /api/events/019d2d72-eee3-7b29-9af2-f15d04e4b6d8/seats/available
+```
+
+### Seats & Reservations
+
+| Method | Endpoint                                | Description                    |
+| ------ | --------------------------------------- | ------------------------------ |
+| GET    | `/api/events/{eventId}/seats`           | Get seats for an event         |
+| POST   | `/api/events/{eventId}/reserve`         | Reserve seats                  |
+| POST   | `/api/reservations/{reservationId}/cancel` | Cancel reservation         |
+
+**Query Parameters (GET /api/events/{eventId}/seats):**
+
+| Parameter | Type | Required | Default | Description                |
+| --------- | ---- | -------- | ------- | -------------------------- |
+| `page`    | int  | No       | 0       | Page number (0-indexed)    |
+| `size`    | int  | No       | 20      | Page size                  |
+
+**Reserve Seats Request:**
+
+```bash
+POST /api/events/{eventId}/reserve
+Content-Type: application/json
+
+{
+  "customerName": "John Doe",
+  "seatCount": 3
+}
+```
+
+**Example:**
+
+```bash
+# Get seats for an event
+GET /api/events/019d2d72-eee3-7b29-9af2-f15d04e4b6d8/seats
+GET /api/events/019d2d72-eee3-7b29-9af2-f15d04e4b6d8/seats?page=0&size=50
+
+# Reserve seats
+curl -X POST http://localhost:6661/api/events/019d2d72-eee3-7b29-9af2-f15d04e4b6d8/reserve \
+  -H "Content-Type: application/json" \
+  -d '{"customerName": "John Doe", "seatCount": 3}'
+
+# Cancel reservation
+curl -X POST http://localhost:6661/api/reservations/019d2d72-eee3-7b29-9af2-f15d04e4b6d8/cancel
+```
+
+## Seat Reservation System
+
+The seat reservation system uses **pessimistic locking** with `SELECT FOR UPDATE SKIP LOCKED` to prevent deadlocks and handle concurrent reservations.
+
+### How It Works
+
+1. **Find Available Seats**: Uses `FOR UPDATE SKIP LOCKED` to lock available seats atomically
+2. **Reserve Seats**: Updates seat status within the same transaction
+3. **Cancel Reservation**: Releases reserved seats back to available pool
+
+### Concurrency Handling
+
+- **SKIP LOCKED**: Prevents blocking when seats are already locked by another transaction
+- **Transaction**: All seat updates in a single transaction for atomicity
+- **Rollback**: Automatic rollback on failure
+
 ## Configuration
 
 Configure via environment variables or `src/main/resources/application.yaml`:
@@ -208,6 +312,8 @@ scheduler:
     total-tutorials: ${DATA_SEEDER_TOTAL_TUTORIALS:10}
     max-products-per-company: ${DATA_SEEDER_MAX_PRODUCTS_PER_COMPANY:5}
     max-companies-per-product: ${DATA_SEEDER_MAX_COMPANIES_PER_PRODUCT:3}
+  seat-seeder:
+    enabled: ${SEAT_SEEDER_ENABLED:true}
 ```
 
 ## Database Setup
@@ -285,11 +391,12 @@ java -jar target/java-spring-boot-sql2o-rest-crud-1.0-SNAPSHOT.jar
 | BULKHEAD_MAX_CONCURRENT_CALLS         | 29                               | Max concurrent bulkhead calls |
 | BULKHEAD_MAX_WAIT_DURATION            | 100ms                            | Max wait duration             |
 | DATA_SEEDER_ENABLED                   | false                            | Enable data seeder scheduler  |
-| DATA_SEEDER_CRON                      | 0 \* \* \* \* ?                  | Data seeder cron expression   |
+| DATA_SEEDER_CRON                      | 0 * * * * ?                      | Data seeder cron expression   |
 | DATA_SEEDER_TOTAL_COMPANIES           | 10                               | Total companies to seed       |
-| DATA_SEEDER_TOTAL_PRODUCTS            | 15                               | Total products to seed        |
+| DATA_SEEDER_TOTAL_PRODUCTS           | 15                               | Total products to seed        |
 | DATA_SEEDER_TOTAL_TUTORIALS           | 10                               | Total tutorials to seed       |
 | DATA_SEEDER_MAX_COMPANIES_PER_PRODUCT | 3                                | Max companies per product     |
+| SEAT_SEEDER_ENABLED                   | true                             | Enable seat seeder            |
 
 ## Key Features
 
@@ -309,6 +416,7 @@ java -jar target/java-spring-boot-sql2o-rest-crud-1.0-SNAPSHOT.jar
 - **Request Tracing**: X-Trace-Id header for distributed tracing
 - **CORS Enabled**: Cross-origin requests allowed for all origins
 - **Global Exception Handling**: Consistent error responses
+- **Seat Reservation**: Pessimistic locking with FOR UPDATE SKIP LOCKED for deadlock avoidance
 
 ## Response Format
 
@@ -356,6 +464,48 @@ All list endpoints return paginated responses:
   "title": "Creating Security",
   "description": "Step-by-step tutorial for beginners",
   "published": true
+}
+```
+
+### Event Response
+
+```json
+{
+  "id": "019d2d7d-eb52-70ac-87f2-036e33bc4829",
+  "name": "Tech Conference 2026",
+  "venue": "Convention Center Hall A"
+}
+```
+
+### Seat Response
+
+```json
+{
+  "id": "019d2d7d-eb52-70ac-87f2-036e33bc4830",
+  "eventId": "019d2d7d-eb52-70ac-87f2-036e33bc4829",
+  "seatNumber": "A1",
+  "reserved": false,
+  "reservationId": null
+}
+```
+
+### Seat Availability Response
+
+```json
+{
+  "total": 50,
+  "available": 47
+}
+```
+
+### Reservation Response
+
+```json
+{
+  "id": "019d2d7d-eb52-70ac-87f2-036e33bc4831",
+  "eventId": "019d2d7d-eb52-70ac-87f2-036e33bc4829",
+  "customerName": "John Doe",
+  "seatCount": 3
 }
 ```
 
