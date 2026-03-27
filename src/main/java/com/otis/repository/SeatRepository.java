@@ -76,8 +76,7 @@ public class SeatRepository {
 	}
 
 	public int reserveSeatsInTransaction(List<UUID> seatIds, UUID reservationId) {
-		Connection conn = sql2o.beginTransaction();
-		try {
+		try (Connection conn = sql2o.beginTransaction()) {
 			int reserved = 0;
 			for (UUID seatId : seatIds) {
 				String lockSql = "SELECT id FROM seats WHERE id = :id AND reserved = FALSE FOR UPDATE";
@@ -100,10 +99,7 @@ public class SeatRepository {
 			return reserved;
 		} catch (Exception e) {
 			log.error("Error reserving seats: ", e);
-			conn.rollback();
 			return 0;
-		} finally {
-			conn.close();
 		}
 	}
 

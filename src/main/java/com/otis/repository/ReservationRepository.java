@@ -16,33 +16,33 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Repository
 public class ReservationRepository {
-    private final Sql2o sql2o;
-    private final ElSql bundle;
+	private final Sql2o sql2o;
+	private final ElSql bundle;
 
-    public ReservationRepository(Sql2o sql2o) {
-        this.sql2o = sql2o;
-        this.bundle = ElSql.of(ElSqlConfig.MYSQL, ReservationRepository.class);
-    }
+	public ReservationRepository(Sql2o sql2o) {
+		this.sql2o = sql2o;
+		this.bundle = ElSql.of(ElSqlConfig.MYSQL, ReservationRepository.class);
+	}
 
-    public void create(Reservation reservation) {
-        String sql = bundle.getSql("Create");
-        log.info("Create reservation: {}", sql);
-        try (Connection conn = sql2o.open()) {
-            conn.createQuery(sql)
-                    .addParameter("id", reservation.getId().toString())
-                    .addParameter(ConstantPreference.EVENT_ID, reservation.getEventId().toString())
-                    .addParameter("customerName", reservation.getCustomerName())
-                    .addParameter("seatCount", reservation.getSeatCount())
-                    .executeUpdate();
-        }
-    }
+	public void create(Reservation reservation) {
+		String sql = bundle.getSql("Create");
+		log.info("Create reservation: {}", sql);
+		try (Connection conn = sql2o.open()) {
+			conn.createQuery(sql)
+					.addParameter("id", reservation.getId().toString())
+					.addParameter(ConstantPreference.EVENT_ID, reservation.getEventId().toString())
+					.addParameter("customerName", reservation.getCustomerName())
+					.addParameter("seatCount", reservation.getSeatCount())
+					.executeUpdate();
+		}
+	}
 
-    public Reservation findById(UUID id) {
-        String sql = bundle.getSql("FindById");
-        try (Connection conn = sql2o.open()) {
-            return conn.createQuery(sql)
-                    .addParameter("id", id.toString())
-                    .executeAndFetchFirst(Reservation.class);
-        }
-    }
+	public Reservation findById(UUID id) {
+		String sql = bundle.getSql("FindById");
+		try (Connection conn = sql2o.open()) {
+			return conn.createQuery(sql)
+					.addParameter("id", id.toString())
+					.executeAndFetchFirst(Reservation.class);
+		}
+	}
 }
