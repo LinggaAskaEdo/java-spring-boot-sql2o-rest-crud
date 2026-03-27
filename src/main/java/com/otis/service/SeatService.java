@@ -50,7 +50,7 @@ public class SeatService {
 			return null;
 		}
 
-		List<UUID> seatIds = lockedSeats.stream().map(Seat::getId).toList();
+		List<UUID> seatIds = lockedSeats.stream().map(Seat::id).toList();
 		int reserved = seatRepository.reserveSeatsInTransaction(seatIds, reservationId);
 
 		if (reserved != seatCount) {
