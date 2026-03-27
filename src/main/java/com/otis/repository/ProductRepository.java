@@ -1,9 +1,5 @@
 package com.otis.repository;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
@@ -29,73 +25,48 @@ public class ProductRepository {
 		this.bundle = ElSql.of(ElSqlConfig.MYSQL, ProductRepository.class);
 	}
 
-	public List<Product> findAll() {
-		String sql = bundle.getSql("GetAllProduct");
-		log.info("GetAllProduct: {}", sql);
+	public java.util.List<Product> findByFilters(UUID id, String name, UUID companyId, String companyName) {
+		StringBuilder sql = new StringBuilder(bundle.getSql("FindByFilters"));
+		String separator = ConstantPreference.WHERE;
 
-		List<Product> result = null;
-		Map<String, String> colMaps = new HashMap<>();
-		colMaps.put(ConstantPreference.COMPANY_ID, ConstantPreference.COMPANYID);
-
-		sql2o.setDefaultColumnMappings(colMaps);
-
-		try (Connection connection = sql2o.open(); Query query = connection.createQuery(sql)) {
-			result = query.executeAndFetch(Product.class);
-		} catch (Exception e) {
-			log.error("Error when findAll: ", e);
+		if (id != null) {
+			sql.append(separator).append("p.id = :id");
+			separator = ConstantPreference.AND;
 		}
 
-		return result;
-	}
-
-	public List<Product> findByNameContaining(String title) {
-		String sql = bundle.getSql("GetProductByNameContain");
-		log.info("GetProductByNameContain: {}", sql);
-
-		List<Product> result = null;
-		Map<String, String> colMaps = new HashMap<>();
-		colMaps.put(ConstantPreference.COMPANY_ID, ConstantPreference.COMPANYID);
-
-		sql2o.setDefaultColumnMappings(colMaps);
-
-		try (Connection connection = sql2o.open(); Query query = connection.createQuery(sql)) {
-			result = query.addParameter("name", "%" + title + "%").executeAndFetch(Product.class);
-		} catch (Exception e) {
-			log.error("Error when findByNameContaining: ", e);
+		if (name != null && !name.isBlank()) {
+			sql.append(separator).append("p.name LIKE :name");
+			separator = ConstantPreference.AND;
 		}
 
-		return result;
-	}
-
-	public List<Product> findProductByCompanyID(UUID companyID) {
-		String sql = bundle.getSql("GetProductByCompanyID");
-		log.info("GetProductByCompanyID: {}", sql);
-
-		List<Product> result = null;
-		Map<String, String> colMaps = new HashMap<>();
-		colMaps.put(ConstantPreference.COMPANY_ID, ConstantPreference.COMPANYID);
-
-		sql2o.setDefaultColumnMappings(colMaps);
-
-		try (Connection connection = sql2o.open(); Query query = connection.createQuery(sql)) {
-			result = query.addParameter("company_id", companyID.toString()).executeAndFetch(Product.class);
-		} catch (Exception e) {
-			log.error("Error when findProductByCompanyID: ", e);
+		if (companyId != null) {
+			sql.append(separator).append("p.company_id = :companyId");
+			separator = ConstantPreference.AND;
 		}
 
-		return result;
-	}
-
-	public List<Map<String, Object>> getReportData() {
-		String sql = bundle.getSql("GetReportData");
-		log.info("GetReportData: {}", sql);
-
-		try (Connection connection = sql2o.open(); Query query = connection.createQuery(sql)) {
-			return query.executeAndFetchTable().asList();
-		} catch (Exception e) {
-			log.error("Error when findProductByCompanyID: ", e);
+		if (companyName != null && !companyName.isBlank()) {
+			sql.append(separator).append("c.name LIKE :companyName");
 		}
 
-		return Collections.emptyList();
+		log.info("FindByFilters: {}", sql);
+		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql.toString())) {
+			if (id != null) {
+				query.addParameter("id", id.toString());
+			}
+
+			if (name != null && !name.isBlank()) {
+				query.addParameter("name", "%" + name + "%");
+			}
+
+			if (companyId != null) {
+				query.addParameter("companyId", companyId.toString());
+			}
+
+			if (companyName != null && !companyName.isBlank()) {
+				query.addParameter("companyName", "%" + companyName + "%");
+			}
+
+			return query.executeAndFetch(Product.class);
+		}
 	}
 }

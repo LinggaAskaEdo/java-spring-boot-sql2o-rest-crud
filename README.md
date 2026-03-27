@@ -31,6 +31,7 @@ src/main/java/com/otis/
 │   ├── TraceIdFilter.java           # Request tracing filter
 │   └── VirtualThreadConfig.java      # Jetty virtual thread configuration
 ├── controller/
+│   ├── CompanyController.java         # Company REST endpoints
 │   ├── ProductController.java         # Product REST endpoints
 │   └── TutorialController.java        # Tutorial REST endpoints
 ├── exception/
@@ -59,6 +60,7 @@ src/main/java/com/otis/
 │   ├── RandomUtils.java             # Random data generator utility
 │   └── UuidUtils.java               # UUID parsing utility
 └── service/
+    ├── CompanyService.java          # Company business logic
     ├── ProductService.java            # Product business logic
     └── TutorialService.java           # Tutorial business logic
 
@@ -86,19 +88,62 @@ src/main/resources/
 
 ### Products
 
-| Method | Endpoint                                | Description                              |
-| ------ | --------------------------------------- | ---------------------------------------- |
-| GET    | `/api/products`                         | Get all products (optional: `?name=xxx`) |
-| GET    | `/api/products/{id}`                    | Get product by UUID                      |
-| GET    | `/api/products/company?companyName=xxx` | Get products by company name             |
-| GET    | `/api/products/report`                  | Get product-company report data          |
+| Method | Endpoint | Description |
+| ------ | -------- | ----------- |
+| GET | `/api/products` | Get all products with optional filters |
+
+**Query Parameters:**
+| Parameter | Type | Description |
+| --------- | ---- | ----------- |
+| `id` | UUID | Filter by product ID |
+| `name` | String | Filter by name (partial match) |
+| `company` | UUID | Filter by company ID |
+| `companyName` | String | Filter by company name (partial match) |
+
+**Example:**
+```bash
+GET /api/products
+GET /api/products?name=Security
+GET /api/products?name=Security&companyName=Singapore
+```
+
+### Companies
+
+| Method | Endpoint | Description |
+| ------ | -------- | ----------- |
+| GET | `/api/companies` | Get all companies with optional filters |
+
+**Query Parameters:**
+| Parameter | Type | Description |
+| --------- | ---- | ----------- |
+| `id` | UUID | Filter by company ID |
+| `name` | String | Filter by name (partial match) |
+
+**Example:**
+```bash
+GET /api/companies
+GET /api/companies?name=Singapore
+```
 
 ### Tutorials
 
-| Method | Endpoint              | Description                                |
-| ------ | --------------------- | ------------------------------------------ |
-| GET    | `/api/tutorials`      | Get all tutorials (optional: `?title=xxx`) |
-| GET    | `/api/tutorials/{id}` | Get tutorial by UUID                       |
+| Method | Endpoint | Description |
+| ------ | -------- | ----------- |
+| GET | `/api/tutorials` | Get all tutorials with optional filters |
+
+**Query Parameters:**
+| Parameter | Type | Description |
+| --------- | ---- | ----------- |
+| `id` | UUID | Filter by tutorial ID |
+| `title` | String | Filter by title (partial match) |
+| `description` | String | Filter by description (partial match) |
+| `published` | Boolean | Filter by published status |
+
+**Example:**
+```bash
+GET /api/tutorials
+GET /api/tutorials?title=spring&published=true
+```
 
 ## Configuration
 
@@ -240,6 +285,8 @@ java -jar target/java-spring-boot-sql2o-rest-crud-1.0-SNAPSHOT.jar
 - **Flyway**: Version-controlled database migrations
 - **Sql2o**: Lightweight JDBC wrapper for easy database operations
 - **ElSql**: External SQL file management for clean repository code
+- **Dynamic Queries**: Dynamic WHERE clause building with ElSql base queries
+- **Consolidated Endpoints**: Single endpoint per entity with filter parameters
 - **Data Seeder**: Scheduled seeding of real data for companies, products, and tutorials
 - **JSON Logging**: Structured JSON logs with traceId support
 - **Request Tracing**: X-Trace-Id header for distributed tracing
@@ -248,12 +295,34 @@ java -jar target/java-spring-boot-sql2o-rest-crud-1.0-SNAPSHOT.jar
 
 ## Response Format
 
-### Success Response
+### Product Response
 
 ```json
 {
-  "id": "018e0000-0000-7000-8000-000000000001",
-  "name": "LVIV"
+  "id": "019d2d72-eee3-7b29-9af2-f15d04e4b6d8",
+  "name": "Security Services",
+  "companyID": "019d2d72-eed8-72b3-bb87-a57c3a1a56b6",
+  "companyName": "Singapore Solutions Technologies"
+}
+```
+
+### Company Response
+
+```json
+{
+  "id": "019d2d72-eed2-7754-a5b5-1ef67f17fc6c",
+  "name": "Singapore Solutions Technologies"
+}
+```
+
+### Tutorial Response
+
+```json
+{
+  "id": "019d2d7d-eb52-70ac-87f2-036e33bc4829",
+  "title": "Creating Security",
+  "description": "Step-by-step tutorial for beginners",
+  "published": true
 }
 ```
 

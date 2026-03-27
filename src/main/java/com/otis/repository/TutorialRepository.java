@@ -1,7 +1,5 @@
 package com.otis.repository;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
@@ -12,6 +10,7 @@ import org.sql2o.Sql2o;
 import com.opengamma.elsql.ElSql;
 import com.opengamma.elsql.ElSqlConfig;
 import com.otis.model.Tutorial;
+import com.otis.preference.ConstantPreference;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,52 +25,48 @@ public class TutorialRepository {
 		this.bundle = ElSql.of(ElSqlConfig.MYSQL, TutorialRepository.class);
 	}
 
-	public List<Tutorial> findAll() {
-		String sql = bundle.getSql("GetAllTutorial");
-		log.info("GetAllTutorial: {}", sql);
+	public java.util.List<Tutorial> findByFilters(UUID id, String title, String description, Boolean published) {
+		StringBuilder sql = new StringBuilder(bundle.getSql("FindByFilters"));
+		String separator = ConstantPreference.WHERE;
 
-		List<Tutorial> result = null;
-
-		try (Connection connection = sql2o.open(); Query query = connection.createQuery(sql)) {
-			result = query.executeAndFetch(Tutorial.class);
-		} catch (Exception e) {
-			log.error("Error when findAll: ", e);
+		if (id != null) {
+			sql.append(separator).append("id = :id");
+			separator = ConstantPreference.AND;
 		}
 
-		return result;
-	}
-
-	public List<Tutorial> findByTitleContaining(String title) {
-		String sql = bundle.getSql("GetTutorialByTitleContain");
-		log.info("GetTutorialByTitleContain: {}", sql);
-
-		List<Tutorial> result = null;
-
-		try (Connection connection = sql2o.open(); Query query = connection.createQuery(sql)) {
-			result = query.addParameter("title", "%" + title + "%").executeAndFetch(Tutorial.class);
-		} catch (Exception e) {
-			log.error("Error when findAll: ", e);
+		if (title != null && !title.isBlank()) {
+			sql.append(separator).append("title LIKE :title");
+			separator = ConstantPreference.AND;
 		}
 
-		return result;
-	}
+		if (description != null && !description.isBlank()) {
+			sql.append(separator).append("description LIKE :description");
+			separator = ConstantPreference.AND;
+		}
 
-	public Optional<Tutorial> findById(UUID id) {
-		String sql = bundle.getSql("GetTutorialById");
-		log.info("GetTutorialById: {}", sql);
+		if (published != null) {
+			sql.append(separator).append("published = :published");
+		}
 
-		Optional<Tutorial> result = Optional.empty();
-
-		try (Connection connection = sql2o.open(); Query query = connection.createQuery(sql)) {
-			Tutorial tutorial = query.addParameter("id", id.toString()).executeAndFetchFirst(Tutorial.class);
-
-			if (null != tutorial) {
-				result = Optional.of(tutorial);
+		log.info("FindByFilters: {}", sql);
+		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql.toString())) {
+			if (id != null) {
+				query.addParameter("id", id.toString());
 			}
-		} catch (Exception e) {
-			log.error("Error when findById: ", e);
-		}
 
-		return result;
+			if (title != null && !title.isBlank()) {
+				query.addParameter("title", "%" + title + "%");
+			}
+
+			if (description != null && !description.isBlank()) {
+				query.addParameter("description", "%" + description + "%");
+			}
+
+			if (published != null) {
+				query.addParameter("published", published);
+			}
+
+			return query.executeAndFetch(Tutorial.class);
+		}
 	}
 }

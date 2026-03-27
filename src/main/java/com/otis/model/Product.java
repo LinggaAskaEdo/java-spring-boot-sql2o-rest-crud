@@ -21,5 +21,6 @@ public class Product {
 	private UUID id;
 	private String name;
 	private UUID companyID;
+	private String companyName;
 	private List<Company> companies;
 }

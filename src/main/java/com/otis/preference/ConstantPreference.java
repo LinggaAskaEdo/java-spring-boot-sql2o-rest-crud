@@ -7,4 +7,6 @@ public class ConstantPreference {
 
 	public static final String COMPANY_ID = "company_id";
 	public static final String COMPANYID = "companyID";
+	public static final String AND = " AND ";
+	public static final String WHERE = " WHERE ";
 }

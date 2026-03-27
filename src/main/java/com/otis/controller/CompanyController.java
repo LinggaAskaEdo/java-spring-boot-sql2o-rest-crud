@@ -11,30 +11,28 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.otis.model.Product;
-import com.otis.service.ProductService;
+import com.otis.model.Company;
+import com.otis.service.CompanyService;
 
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api")
-public class ProductController {
-	private final ProductService service;
+public class CompanyController {
+	private final CompanyService service;
 
-	public ProductController(ProductService service) {
+	public CompanyController(CompanyService service) {
 		this.service = service;
 	}
 
-	@GetMapping("/products")
-	public ResponseEntity<List<Product>> getAllProducts(
+	@GetMapping("/companies")
+	public ResponseEntity<List<Company>> getAllCompanies(
 			@RequestParam(required = false) UUID id,
-			@RequestParam(required = false) String name,
-			@RequestParam(required = false) UUID company,
-			@RequestParam(required = false) String companyName) {
-		List<Product> products = service.findByFilters(id, name, company, companyName);
-		if (products.isEmpty()) {
+			@RequestParam(required = false) String name) {
+		List<Company> companies = service.findByFilters(id, name);
+		if (companies.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
 
-		return new ResponseEntity<>(products, HttpStatus.OK);
+		return new ResponseEntity<>(companies, HttpStatus.OK);
 	}
 }

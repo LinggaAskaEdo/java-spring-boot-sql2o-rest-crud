@@ -1,7 +1,5 @@
 package com.otis.repository;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
@@ -27,41 +25,30 @@ public class CompanyRepository {
 		this.bundle = ElSql.of(ElSqlConfig.MYSQL, CompanyRepository.class);
 	}
 
-	public Company getCompanyByName(String name) {
-		String sql = bundle.getSql("GetCompanyByName");
-		log.info("GetCompanyByName: {}", sql);
+	public java.util.List<Company> findByFilters(UUID id, String name) {
+		StringBuilder sql = new StringBuilder(bundle.getSql("FindByFilters"));
+		String separator = ConstantPreference.WHERE;
 
-		Company result = null;
-		Map<String, String> colMaps = new HashMap<>();
-		colMaps.put(ConstantPreference.COMPANY_ID, ConstantPreference.COMPANYID);
-
-		sql2o.setDefaultColumnMappings(colMaps);
-
-		try (Connection connection = sql2o.open(); Query query = connection.createQuery(sql)) {
-			result = query.addParameter("name", name).executeAndFetchFirst(Company.class);
-		} catch (Exception e) {
-			log.error("Error when getCompanyByName: ", e);
+		if (id != null) {
+			sql.append(separator).append("id = :id");
+			separator = ConstantPreference.AND;
 		}
 
-		return result;
-	}
-
-	public Company findById(UUID id) {
-		String sql = bundle.getSql("GetCompanyById");
-		log.info("GetCompanyById: {}", sql);
-
-		Company result = null;
-		Map<String, String> colMaps = new HashMap<>();
-		colMaps.put(ConstantPreference.COMPANY_ID, ConstantPreference.COMPANYID);
-
-		sql2o.setDefaultColumnMappings(colMaps);
-
-		try (Connection connection = sql2o.open(); Query query = connection.createQuery(sql)) {
-			result = query.addParameter("id", id.toString()).executeAndFetchFirst(Company.class);
-		} catch (Exception e) {
-			log.error("Error when findById: ", e);
+		if (name != null && !name.isBlank()) {
+			sql.append(separator).append("name LIKE :name");
 		}
 
-		return result;
+		log.info("FindByFilters: {}", sql);
+		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql.toString())) {
+			if (id != null) {
+				query.addParameter("id", id.toString());
+			}
+
+			if (name != null && !name.isBlank()) {
+				query.addParameter("name", "%" + name + "%");
+			}
+
+			return query.executeAndFetch(Company.class);
+		}
 	}
 }
