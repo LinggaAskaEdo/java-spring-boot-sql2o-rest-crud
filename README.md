@@ -51,10 +51,12 @@ src/main/java/com/otis/
 │   ├── CompanyRepository.java         # Company data access
 │   ├── ProductRepository.java         # Product data access
 │   └── TutorialRepository.java        # Tutorial data access
+├── scheduler/
+│   └── DataSeederScheduler.java       # Data seeding scheduler
 ├── util/
 │   ├── BulkheadUtils.java            # Bulkhead helper utility
 │   ├── JsonUtils.java               # ObjectMapper utility
-│   ├── RandomUtils.java             # SecureRandom utility
+│   ├── RandomUtils.java             # Random data generator utility
 │   └── UuidUtils.java               # UUID parsing utility
 └── service/
     ├── ProductService.java            # Product business logic
@@ -71,10 +73,13 @@ src/main/resources/
 │   ├── V20260325130933__create_table_products_company.sql # Product-Company relation
 │   ├── V20260325131006__create_table_tutorials.sql      # Tutorials table
 │   └── V20260325131038__create_table_tutorial_details.sql # Tutorial details table
-└── com/otis/repository/
-    ├── CompanyRepository.elsql         # Company SQL queries
-    ├── ProductRepository.elsql        # Product SQL queries
-    └── TutorialRepository.elsql       # Tutorial SQL queries
+└── com/otis/
+    ├── repository/
+    │   ├── CompanyRepository.elsql         # Company SQL queries
+    │   ├── ProductRepository.elsql        # Product SQL queries
+    │   └── TutorialRepository.elsql       # Tutorial SQL queries
+    └── scheduler/
+        └── DataSeederScheduler.elsql      # Data seeder SQL queries
 ```
 
 ## API Endpoints
@@ -131,7 +136,17 @@ resilience4j:
     instances:
       database:
         max-concurrent-calls: ${BULKHEAD_MAX_CONCURRENT_CALLS:29}
-        max-wait-duration-ms: ${BULKHEAD_MAX_WAIT_DURATION_MS:0}
+        max-wait-duration: ${BULKHEAD_MAX_WAIT_DURATION:100ms}
+
+scheduler:
+  data-seeder:
+    enabled: ${DATA_SEEDER_ENABLED:false}
+    cron: ${DATA_SEEDER_CRON:0 0 0 * * ?}
+    total-companies: ${DATA_SEEDER_TOTAL_COMPANIES:10}
+    total-products: ${DATA_SEEDER_TOTAL_PRODUCTS:15}
+    total-tutorials: ${DATA_SEEDER_TOTAL_TUTORIALS:10}
+    max-products-per-company: ${DATA_SEEDER_MAX_PRODUCTS_PER_COMPANY:5}
+    max-companies-per-product: ${DATA_SEEDER_MAX_COMPANIES_PER_PRODUCT:3}
 ```
 
 ## Database Setup
@@ -192,22 +207,28 @@ java -jar target/java-spring-boot-sql2o-rest-crud-1.0-SNAPSHOT.jar
 
 ## Environment Variables
 
-| Variable                      | Default                          | Description                       |
-| ----------------------------- | -------------------------------- | --------------------------------- |
-| DB_HOST                       | localhost                        | Database host                     |
-| DB_PORT                       | 3306                             | Database port                     |
-| DB_NAME                       | java-spring-boot-sql2o-rest-crud | Database name                     |
-| DB_USERNAME                   | root                             | Database username                 |
-| DB_PASSWORD                   | root                             | Database password                 |
-| LOG_PATH                      | logs                             | Log directory path                |
-| MYSQL_DOCKER_HOST             | localhost                        | MySQL Docker host                 |
-| MYSQL_DOCKER_PORT             | 3306                             | MySQL Docker port                 |
-| MYSQL_DOCKER_DATABASE         | java-spring-boot-sql2o-rest-crud | Database name                     |
-| MYSQL_DOCKER_USERNAME         | root                             | Database username                 |
-| MYSQL_DOCKER_PASSWORD         |                                  | Database password                 |
-| VT_NAME_PREFIX                | vt-jetty-                        | Virtual thread name prefix        |
-| BULKHEAD_MAX_CONCURRENT_CALLS | 29                               | Max concurrent bulkhead calls     |
-| BULKHEAD_MAX_WAIT_DURATION_MS | 0                                | Max wait duration in milliseconds |
+| Variable                              | Default                          | Description                   |
+| ------------------------------------- | -------------------------------- | ----------------------------- |
+| DB_HOST                               | localhost                        | Database host                 |
+| DB_PORT                               | 3306                             | Database port                 |
+| DB_NAME                               | java-spring-boot-sql2o-rest-crud | Database name                 |
+| DB_USERNAME                           | root                             | Database username             |
+| DB_PASSWORD                           | root                             | Database password             |
+| LOG_PATH                              | logs                             | Log directory path            |
+| MYSQL_DOCKER_HOST                     | localhost                        | MySQL Docker host             |
+| MYSQL_DOCKER_PORT                     | 3306                             | MySQL Docker port             |
+| MYSQL_DOCKER_DATABASE                 | java-spring-boot-sql2o-rest-crud | Database name                 |
+| MYSQL_DOCKER_USERNAME                 | root                             | Database username             |
+| MYSQL_DOCKER_PASSWORD                 |                                  | Database password             |
+| VT_NAME_PREFIX                        | vt-jetty-                        | Virtual thread name prefix    |
+| BULKHEAD_MAX_CONCURRENT_CALLS         | 29                               | Max concurrent bulkhead calls |
+| BULKHEAD_MAX_WAIT_DURATION            | 100ms                            | Max wait duration             |
+| DATA_SEEDER_ENABLED                   | false                            | Enable data seeder scheduler  |
+| DATA_SEEDER_CRON                      | 0 \* \* \* \* ?                  | Data seeder cron expression   |
+| DATA_SEEDER_TOTAL_COMPANIES           | 10                               | Total companies to seed       |
+| DATA_SEEDER_TOTAL_PRODUCTS            | 15                               | Total products to seed        |
+| DATA_SEEDER_TOTAL_TUTORIALS           | 10                               | Total tutorials to seed       |
+| DATA_SEEDER_MAX_COMPANIES_PER_PRODUCT | 3                                | Max companies per product     |
 
 ## Key Features
 
@@ -219,6 +240,7 @@ java -jar target/java-spring-boot-sql2o-rest-crud-1.0-SNAPSHOT.jar
 - **Flyway**: Version-controlled database migrations
 - **Sql2o**: Lightweight JDBC wrapper for easy database operations
 - **ElSql**: External SQL file management for clean repository code
+- **Data Seeder**: Scheduled seeding of real data for companies, products, and tutorials
 - **JSON Logging**: Structured JSON logs with traceId support
 - **Request Tracing**: X-Trace-Id header for distributed tracing
 - **CORS Enabled**: Cross-origin requests allowed for all origins

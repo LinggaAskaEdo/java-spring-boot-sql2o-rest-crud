@@ -37,5 +37,14 @@ resilience4j:
   bulkhead:
     instances:
       database:
-        max-concurrent-calls: 29
-        max-wait-duration: 100ms
+        max-concurrent-calls: ${BULKHEAD_MAX_CONCURRENT_CALLS:29}
+        max-wait-duration: ${BULKHEAD_MAX_WAIT_DURATION:100ms}
+
+scheduler:
+  data-seeder:
+    enabled: ${DATA_SEEDER_ENABLED:true}
+    cron: ${DATA_SEEDER_CRON:0 * * * * ?}
+    total-companies: ${DATA_SEEDER_TOTAL_COMPANIES:10}
+    total-products: ${DATA_SEEDER_TOTAL_PRODUCTS:15}
+    total-tutorials: ${DATA_SEEDER_TOTAL_TUTORIALS:10}
+    max-companies-per-product: ${DATA_SEEDER_MAX_COMPANIES_PER_PRODUCT:3}

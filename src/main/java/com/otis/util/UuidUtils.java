@@ -4,6 +4,8 @@ import java.util.UUID;
 
 import com.otis.exception.BadRequestException;
 
+import xyz.block.uuidv7.MonotonicUUIDv7;
+
 public final class UuidUtils {
 	private UuidUtils() {
 	}
@@ -14,5 +16,9 @@ public final class UuidUtils {
 		} catch (IllegalArgumentException e) {
 			throw new BadRequestException("Invalid UUID format: " + id);
 		}
+	}
+
+	public static UUID randomUuidV7() {
+		return MonotonicUUIDv7.generate();
 	}
 }

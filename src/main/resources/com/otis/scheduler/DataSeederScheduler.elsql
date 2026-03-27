@@ -1,0 +1,14 @@
+@NAME(CountRecords)
+    SELECT COUNT(*) AS cnt FROM :tableName
+
+@NAME(InsertCompany)
+    INSERT INTO company (id, name) VALUES (:id, :name)
+
+@NAME(InsertProduct)
+    INSERT INTO products (id, name, company_id) VALUES (:id, :name, :companyId)
+
+@NAME(InsertProductsCompany)
+    INSERT INTO products_company (product_id, company_id) VALUES (:productId, :companyId)
+
+@NAME(InsertTutorial)
+    INSERT INTO tutorials (id, title, description, published) VALUES (:id, :title, :description, :published)

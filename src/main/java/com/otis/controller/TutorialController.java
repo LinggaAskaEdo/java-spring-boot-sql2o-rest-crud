@@ -48,7 +48,8 @@ public class TutorialController {
 	public ResponseEntity<Tutorial> getTutorialById(@PathVariable String id) {
 		UUID uuid = UuidUtils.parseUUID(id);
 
-		Tutorial tutorial = service.findById(uuid)
+		Tutorial tutorial = service
+				.findById(uuid)
 				.orElseThrow(() -> new ResourceNotFoundException("Not found Tutorial with id = " + id));
 
 		return new ResponseEntity<>(tutorial, HttpStatus.OK);

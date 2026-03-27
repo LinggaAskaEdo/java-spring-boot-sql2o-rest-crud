@@ -19,6 +19,7 @@
 		<elsql.version>1.3</elsql.version>
 		<logstash.version>9.0</logstash.version>
 		<resilience4j.bulkhead.version>2.4.0</resilience4j.bulkhead.version>
+		<uuidv7.version>1.1.0</uuidv7.version>
 	</properties>
 	<dependencies>
 		<!-- Spring Boot Starters -->
@@ -73,6 +74,12 @@
 			<groupId>io.github.resilience4j</groupId>
 			<artifactId>resilience4j-bulkhead</artifactId>
 			<version>${resilience4j.bulkhead.version}</version>
+		</dependency>
+		<!-- UUID v7 -->
+		<dependency>
+			<groupId>xyz.block</groupId>
+			<artifactId>uuidv7</artifactId>
+			<version>${uuidv7.version}</version>
 		</dependency>
 		<!-- Logging -->
 		<dependency>
