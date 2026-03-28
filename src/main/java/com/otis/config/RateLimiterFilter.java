@@ -13,6 +13,9 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.otis.exception.ErrorMessage;
+import com.otis.util.JsonUtils;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -68,10 +71,12 @@ public class RateLimiterFilter extends OncePerRequestFilter {
 		response.setStatus(status.value());
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-		String json = String.format(
-				"{\"statusCode\":%d,\"timestamp\":\"%s\",\"message\":\"%s\",\"description\":\"uri=%s\"}",
-				status.value(), java.time.Instant.now().toString(), message, uri);
+		ErrorMessage errorMessage = new ErrorMessage(
+				status.value(),
+				new java.util.Date(),
+				message,
+				"uri=" + uri);
 
-		response.getWriter().write(json);
+		JsonUtils.getMapper().writeValue(response.getWriter(), errorMessage);
 	}
 }
