@@ -6,5 +6,6 @@ target/
 *.factorypath
 .settings/
 logs/
+reports/
 META-INF/
 .DS_Store

@@ -712,6 +712,35 @@ All list endpoints return paginated responses:
 }
 ```
 
+## Stress Test Report
+
+A stress test was conducted to verify the rate limiting functionality. The test sends 1000 concurrent requests per API key across all endpoints with different rate limiting tiers.
+
+### Test Configuration
+
+| Parameter        | Value                                                      |
+| ---------------- | ---------------------------------------------------------- |
+| Total Requests   | 1000 per key                                               |
+| Concurrency      | 10                                                         |
+| Endpoints Tested | /api/products, /api/companies, /api/tutorials, /api/events |
+
+### Test Results Summary
+
+The rate limiter successfully enforces per-tier limits across all API keys:
+
+| Tier    | Max Requests/sec | Actual req/sec | Rate-Limited |
+| ------- | ---------------- | -------------- | ------------ |
+| VVIP    | 100              | 1,500 - 7,200  | ~90-100%     |
+| VIP     | 50               | 2,800 - 7,700  | ~95-100%     |
+| Premium | 10               | 3,500 - 7,500  | ~99-100%     |
+| General | 1                | 3,700 - 7,000  | ~99-100%     |
+
+### Detailed Report
+
+![Stress Test Report](etc/image/report.png)
+
+Full report available at: `reports/20260329_060541/report.html`
+
 ## License
 
 Propriety of Otis
