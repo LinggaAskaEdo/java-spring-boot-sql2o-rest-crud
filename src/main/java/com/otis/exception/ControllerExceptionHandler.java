@@ -40,6 +40,26 @@ public class ControllerExceptionHandler {
 				request.getDescription(false));
 	}
 
+	@ExceptionHandler(UnauthorizedException.class)
+	@ResponseStatus(value = HttpStatus.UNAUTHORIZED)
+	public ErrorMessage unauthorizedException(UnauthorizedException ex, WebRequest request) {
+		return new ErrorMessage(
+				HttpStatus.UNAUTHORIZED.value(),
+				new Date(),
+				ex.getMessage(),
+				request.getDescription(false));
+	}
+
+	@ExceptionHandler(RateLimitExceededException.class)
+	@ResponseStatus(value = HttpStatus.TOO_MANY_REQUESTS)
+	public ErrorMessage rateLimitExceededException(RateLimitExceededException ex, WebRequest request) {
+		return new ErrorMessage(
+				HttpStatus.TOO_MANY_REQUESTS.value(),
+				new Date(),
+				ex.getMessage(),
+				request.getDescription(false));
+	}
+
 	@ExceptionHandler(Exception.class)
 	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
 	public ErrorMessage globalExceptionHandler(Exception ex, WebRequest request) {

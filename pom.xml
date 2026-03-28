@@ -20,6 +20,7 @@
 		<logstash.version>9.0</logstash.version>
 		<resilience4j.bulkhead.version>2.4.0</resilience4j.bulkhead.version>
 		<uuidv7.version>1.1.0</uuidv7.version>
+		<redisson.version>4.3.0</redisson.version>
 	</properties>
 	<dependencies>
 		<!-- Spring Boot Starters -->
@@ -90,6 +91,12 @@
 			<groupId>net.logstash.logback</groupId>
 			<artifactId>logstash-logback-encoder</artifactId>
 			<version>${logstash.version}</version>
+		</dependency>
+		<!-- Redisson -->
+		<dependency>
+			<groupId>org.redisson</groupId>
+			<artifactId>redisson-spring-boot-starter</artifactId>
+			<version>${redisson.version}</version>
 		</dependency>
 		<!-- Utilities -->
 		<dependency>

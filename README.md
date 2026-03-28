@@ -8,6 +8,7 @@ A RESTful API application built with Spring Boot 4, Sql2o, Flyway, and MySQL for
 | ----------------- | --------- | ------------------------------------------ |
 | Java              | 21        | Runtime                                    |
 | Spring Boot       | 4.0.5     | Framework                                  |
+| Redisson          | 4.3.0     | Distributed rate limiting with Redis       |
 | Resilience4j      | 2.4.0     | Bulkhead for concurrency control           |
 | Sql2o             | 1.9.1     | Database access layer                      |
 | ElSql             | 1.3       | SQL management                             |
@@ -29,7 +30,11 @@ src/main/java/com/otis/
 │   ├── BulkheadConfig.java            # Resilience4j bulkhead configuration
 │   ├── LoggingResponseWrapper.java    # Response body capture wrapper
 │   ├── TraceIdFilter.java             # Request tracing filter
-│   └── VirtualThreadConfig.java        # Jetty virtual thread configuration
+│   ├── VirtualThreadConfig.java        # Jetty virtual thread configuration
+│   ├── RedissonConfig.java            # Redisson client configuration
+│   ├── RateLimiterProperties.java     # Rate limiter configuration properties
+│   ├── RateLimiterKeyInitializer.java # Startup rate limiter key initialization
+│   └── RateLimiterFilter.java        # API key validation & rate limiting filter
 ├── controller/
 │   ├── CompanyController.java         # Company REST endpoints
 │   ├── EventController.java           # Event REST endpoints
@@ -39,6 +44,8 @@ src/main/java/com/otis/
 ├── exception/
 │   ├── BadRequestException.java       # Custom 400 exception
 │   ├── BulkheadFullException.java     # Bulkhead full exception
+│   ├── UnauthorizedException.java     # Unauthorized exception (401)
+│   ├── RateLimitExceededException.java # Rate limit exceeded exception (429)
 │   ├── ControllerExceptionHandler.java # Global exception handling
 │   ├── ErrorMessage.java              # Error response model
 │   └── ResourceNotFoundException.java # Custom 404 exception
@@ -105,6 +112,25 @@ src/main/resources/
 ```
 
 ## API Endpoints
+
+**Authentication Required**: All API endpoints require the `x-api-key` header. Requests without a valid API key will receive `401 Unauthorized`.
+
+```bash
+curl -H "x-api-key: vvip-key-001" http://localhost:6661/api/products
+```
+
+### Rate Limiting
+
+Rate limits are enforced per tier based on the API key:
+
+| Tier    | Max Requests/sec | Example API Keys                 |
+| ------- | ---------------- | -------------------------------- |
+| vvip    | 100              | vvip-key-001, vvip-key-002       |
+| vip     | 50               | vip-key-001, vip-key-002         |
+| premium | 10               | premium-key-001, premium-key-002 |
+| general | 1                | general-key-001, general-key-002 |
+
+Exceeding the rate limit returns `429 Too Many Requests`.
 
 ### Products
 
@@ -296,6 +322,33 @@ spring:
     baseline-on-migrate: true
     locations: classpath:db/migration
 
+redisson:
+  single-server-config:
+    address: "redis://${REDIS_HOST:localhost}:${REDIS_PORT:6379}"
+    password: ${REDIS_PASSWORD:}
+    connection-minimum-idle-size: 1
+    connection-pool-size: 10
+
+rate-limiter:
+  tiers:
+    vvip:
+      max-requests: ${RATE_LIMITER_VVIP_MAX_REQUESTS:100}
+    vip:
+      max-requests: ${RATE_LIMITER_VIP_MAX_REQUESTS:50}
+    premium:
+      max-requests: ${RATE_LIMITER_PREMIUM_MAX_REQUESTS:10}
+    general:
+      max-requests: ${RATE_LIMITER_GENERAL_MAX_REQUESTS:1}
+  api-keys:
+    vvip-key-001: vvip
+    vvip-key-002: vvip
+    vip-key-001: vip
+    vip-key-002: vip
+    premium-key-001: premium
+    premium-key-002: premium
+    general-key-001: general
+    general-key-002: general
+
 resilience4j:
   bulkhead:
     instances:
@@ -388,6 +441,13 @@ java -jar target/java-spring-boot-sql2o-rest-crud-1.0-SNAPSHOT.jar
 | MYSQL_DOCKER_USERNAME                 | root                             | Database username             |
 | MYSQL_DOCKER_PASSWORD                 |                                  | Database password             |
 | VT_NAME_PREFIX                        | vt-jetty-                        | Virtual thread name prefix    |
+| REDIS_HOST                            | localhost                        | Redis host                    |
+| REDIS_PORT                            | 6379                             | Redis port                    |
+| REDIS_PASSWORD                        |                                  | Redis password                |
+| RATE_LIMITER_VVIP_MAX_REQUESTS        | 100                              | VVIP tier max requests/sec    |
+| RATE_LIMITER_VIP_MAX_REQUESTS         | 50                               | VIP tier max requests/sec     |
+| RATE_LIMITER_PREMIUM_MAX_REQUESTS     | 10                               | Premium tier max requests/sec |
+| RATE_LIMITER_GENERAL_MAX_REQUESTS     | 1                                | General tier max requests/sec |
 | BULKHEAD_MAX_CONCURRENT_CALLS         | 29                               | Max concurrent bulkhead calls |
 | BULKHEAD_MAX_WAIT_DURATION            | 100ms                            | Max wait duration             |
 | DATA_SEEDER_ENABLED                   | false                            | Enable data seeder scheduler  |
@@ -403,6 +463,8 @@ java -jar target/java-spring-boot-sql2o-rest-crud-1.0-SNAPSHOT.jar
 - **UUID v7**: Time-ordered unique identifiers for all entities
 - **UUID Validation**: Returns 400 Bad Request for invalid UUID format
 - **Virtual Threads**: Java 21 lightweight threads for high scalability
+- **API Key Authentication**: All endpoints require x-api-key header (401 if missing/invalid)
+- **Redisson Rate Limiting**: Distributed rate limiting with Redis, tiered limits (VVIP/VIP/Premium/General)
 - **Resilience4j Bulkhead**: Concurrent database call limiting (29 calls max)
 - **HikariCP**: High-performance connection pooling
 - **Flyway**: Version-controlled database migrations
@@ -558,6 +620,28 @@ All list endpoints return paginated responses:
   "timestamp": "2026-03-25T10:30:00",
   "message": "Resource not found",
   "description": "/api/products/999"
+}
+```
+
+### Unauthorized Response (401)
+
+```json
+{
+  "statusCode": 401,
+  "timestamp": "2026-03-28T10:30:00",
+  "message": "Missing required header: x-api-key",
+  "description": "uri=/api/products"
+}
+```
+
+### Rate Limit Exceeded Response (429)
+
+```json
+{
+  "statusCode": 429,
+  "timestamp": "2026-03-28T10:30:00",
+  "message": "Rate limit exceeded for tier: vvip",
+  "description": "uri=/api/products"
 }
 ```
 

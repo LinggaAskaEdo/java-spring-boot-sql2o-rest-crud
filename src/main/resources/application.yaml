@@ -15,8 +15,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       pool-name: HikariPool-1
-      maximum-pool-size: 30
-      throttle-percentage: 98
+      maximum-pool-size: 151 # SHOW VARIABLES LIKE 'max_connections';
       minimum-idle: 5
       idle-timeout: 300000
       max-lifetime: 1800000
@@ -29,20 +28,53 @@ spring:
     validate-on-migrate: true
   jackson:
     default-property-inclusion: non_null
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: ${REDIS_TIMEOUT:5000ms}
+
+redisson:
+  single-server-config:
+    address: "redis://${REDIS_HOST:localhost}:${REDIS_PORT:6379}"
+    password: ${REDIS_PASSWORD:}
+    connection-minimum-idle-size: 1
+    connection-pool-size: 10
 
 logging:
   config: classpath:logback-spring.xml
+
+rate-limiter:
+  tiers:
+    vvip:
+      max-requests: ${RATE_LIMITER_VVIP_MAX_REQUESTS:100}
+    vip:
+      max-requests: ${RATE_LIMITER_VIP_MAX_REQUESTS:50}
+    premium:
+      max-requests: ${RATE_LIMITER_PREMIUM_MAX_REQUESTS:10}
+    general:
+      max-requests: ${RATE_LIMITER_GENERAL_MAX_REQUESTS:1}
+  api-keys:
+    vvip-key-001: vvip
+    vvip-key-002: vvip
+    vip-key-001: vip
+    vip-key-002: vip
+    premium-key-001: premium
+    premium-key-002: premium
+    general-key-001: general
+    general-key-002: general
 
 resilience4j:
   bulkhead:
     instances:
       database:
         max-concurrent-calls: ${BULKHEAD_MAX_CONCURRENT_CALLS:29}
-        max-wait-duration: ${BULKHEAD_MAX_WAIT_DURATION:100ms}
+        max-wait-duration: ${BULKHEAD_MAX_WAIT_DURATION:500ms}
 
 scheduler:
   data-seeder:
-    enabled: ${DATA_SEEDER_ENABLED:true}
+    enabled: ${DATA_SEEDER_ENABLED:false}
     cron: ${DATA_SEEDER_CRON:0 * * * * ?}
     total-companies: ${DATA_SEEDER_TOTAL_COMPANIES:10}
     total-products: ${DATA_SEEDER_TOTAL_PRODUCTS:15}

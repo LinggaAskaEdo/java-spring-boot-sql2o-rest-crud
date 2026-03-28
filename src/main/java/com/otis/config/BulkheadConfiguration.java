@@ -23,6 +23,7 @@ public class BulkheadConfiguration {
 				.maxConcurrentCalls(maxConcurrentCalls)
 				.maxWaitDuration(Duration.ofMillis(maxWaitDurationMs))
 				.build();
+
 		return Bulkhead.of("database", config);
 	}
 }
