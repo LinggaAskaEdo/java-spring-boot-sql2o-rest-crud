@@ -1,8 +1,6 @@
 package com.otis.config;
 
 import java.io.IOException;
-import java.time.Instant;
-import java.util.Date;
 
 import org.redisson.api.RRateLimiter;
 import org.redisson.api.RedissonClient;
@@ -14,9 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.otis.exception.ErrorMessage;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -31,13 +26,10 @@ public class RateLimiterFilter extends OncePerRequestFilter {
 
 	private final RedissonClient redissonClient;
 	private final RateLimiterProperties rateLimiterProperties;
-	private final ObjectMapper objectMapper;
 
-	public RateLimiterFilter(RedissonClient redissonClient, RateLimiterProperties rateLimiterProperties,
-			ObjectMapper objectMapper) {
+	public RateLimiterFilter(RedissonClient redissonClient, RateLimiterProperties rateLimiterProperties) {
 		this.redissonClient = redissonClient;
 		this.rateLimiterProperties = rateLimiterProperties;
-		this.objectMapper = objectMapper;
 	}
 
 	@Override
@@ -76,12 +68,10 @@ public class RateLimiterFilter extends OncePerRequestFilter {
 		response.setStatus(status.value());
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-		ErrorMessage errorMessage = new ErrorMessage(
-				status.value(),
-				Date.from(Instant.now()),
-				message,
-				"uri=" + uri);
+		String json = String.format(
+				"{\"statusCode\":%d,\"timestamp\":\"%s\",\"message\":\"%s\",\"description\":\"uri=%s\"}",
+				status.value(), java.time.Instant.now().toString(), message, uri);
 
-		objectMapper.writeValue(response.getWriter(), errorMessage);
+		response.getWriter().write(json);
 	}
 }
