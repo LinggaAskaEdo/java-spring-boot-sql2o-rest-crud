@@ -1,5 +1,26 @@
 @NAME(FindByFilters)
-    SELECT id, title, description, published FROM tutorials
+    SELECT id, title, description, published
+    FROM tutorials
+    WHERE 1=1
+      @AND(:id)
+        AND id = :id
+      @AND(:title)
+        AND title LIKE :title
+      @AND(:description)
+        AND description LIKE :description
+      @AND(:published)
+        AND published = :published
+    LIMIT :size OFFSET :offset
 
 @NAME(CountByFilters)
-    SELECT COUNT(*) FROM tutorials
+    SELECT COUNT(*)
+    FROM tutorials
+    WHERE 1=1
+      @AND(:id)
+        AND id = :id
+      @AND(:title)
+        AND title LIKE :title
+      @AND(:description)
+        AND description LIKE :description
+      @AND(:published)
+        AND published = :published

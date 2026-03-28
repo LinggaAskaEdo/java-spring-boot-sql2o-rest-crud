@@ -1,5 +1,7 @@
 package com.otis.repository;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
@@ -26,69 +28,53 @@ public class TutorialRepository {
 		this.bundle = ElSql.of(ElSqlConfig.MYSQL, TutorialRepository.class);
 	}
 
-	public PageResponse<Tutorial> findByFilters(int page, int size, UUID id, String title, String description,
-			Boolean published) {
-		StringBuilder sql = new StringBuilder(bundle.getSql("FindByFilters"));
-		StringBuilder countSql = new StringBuilder(bundle.getSql("CountByFilters"));
-		String separator = ConstantPreference.WHERE;
-
+	public PageResponse<Tutorial> findByFilters(int page, int size, UUID id,
+			String title, String description, Boolean published) {
+		Map<String, Object> filterParams = new HashMap<>();
 		if (id != null) {
-			sql.append(separator).append("id = :id");
-			countSql.append(separator).append("id = :id");
-			separator = ConstantPreference.AND;
+			filterParams.put(ConstantPreference.ID, id.toString());
 		}
 
 		if (title != null && !title.isBlank()) {
-			sql.append(separator).append("title LIKE :title");
-			countSql.append(separator).append("title LIKE :title");
-			separator = ConstantPreference.AND;
+			filterParams.put(ConstantPreference.TITLE, "%" + title + "%");
 		}
 
 		if (description != null && !description.isBlank()) {
-			sql.append(separator).append("description LIKE :description");
-			countSql.append(separator).append("description LIKE :description");
-			separator = ConstantPreference.AND;
+			filterParams.put(ConstantPreference.DESCRIPTION, "%" + description + "%");
 		}
 
 		if (published != null) {
-			sql.append(separator).append("published = :published");
-			countSql.append(separator).append("published = :published");
+			filterParams.put(ConstantPreference.PUBLISHED, published);
 		}
 
+		// Build pagination parameters
 		int offset = page * size;
-		sql.append(" LIMIT :size OFFSET :offset");
+		Map<String, Object> pagingParams = new HashMap<>(filterParams);
+		pagingParams.put(ConstantPreference.SIZE, size);
+		pagingParams.put(ConstantPreference.OFFSET, offset);
 
-		log.info("FindByFilters: {}", sql);
+		// Get the dynamic SQL
+		String findSql = bundle.getSql("FindByFilters", pagingParams);
+		String countSql = bundle.getSql("CountByFilters", filterParams);
+
+		log.info("FindByFilters: {}", findSql);
 		log.info("CountByFilters: {}", countSql);
 
 		try (Connection conn = sql2o.open()) {
-			Query query = conn.createQuery(sql.toString());
-			Query countQuery = conn.createQuery(countSql.toString());
-
-			if (id != null) {
-				query.addParameter(ConstantPreference.ID, id.toString());
-				countQuery.addParameter(ConstantPreference.ID, id.toString());
+			// Main query
+			Query query = conn.createQuery(findSql);
+			for (Map.Entry<String, Object> entry : pagingParams.entrySet()) {
+				query.addParameter(entry.getKey(), entry.getValue());
 			}
-
-			if (title != null && !title.isBlank()) {
-				query.addParameter(ConstantPreference.TITLE, "%" + title + "%");
-				countQuery.addParameter(ConstantPreference.TITLE, "%" + title + "%");
-			}
-
-			if (description != null && !description.isBlank()) {
-				query.addParameter(ConstantPreference.DESCRIPTION, "%" + description + "%");
-				countQuery.addParameter(ConstantPreference.DESCRIPTION, "%" + description + "%");
-			}
-
-			if (published != null) {
-				query.addParameter(ConstantPreference.PUBLISHED, published);
-				countQuery.addParameter(ConstantPreference.PUBLISHED, published);
-			}
-
-			query.addParameter(ConstantPreference.SIZE, size);
-			query.addParameter(ConstantPreference.OFFSET, offset);
 
 			var tutorials = query.executeAndFetch(Tutorial.class);
+
+			// Count query
+			Query countQuery = conn.createQuery(countSql);
+			for (Map.Entry<String, Object> entry : filterParams.entrySet()) {
+				countQuery.addParameter(entry.getKey(), entry.getValue());
+			}
+
 			long totalElements = countQuery.executeAndFetchFirst(Integer.class);
 
 			int totalPages = (int) Math.ceil((double) totalElements / size);

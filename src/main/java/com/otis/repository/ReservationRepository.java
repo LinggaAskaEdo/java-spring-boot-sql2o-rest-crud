@@ -1,5 +1,7 @@
 package com.otis.repository;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
@@ -26,25 +28,37 @@ public class ReservationRepository {
 	}
 
 	public void create(Reservation reservation) {
-		String sql = bundle.getSql("Create");
+		Map<String, Object> params = new HashMap<>();
+		params.put(ConstantPreference.ID, reservation.id().toString());
+		params.put(ConstantPreference.EVENT_ID, reservation.eventId().toString());
+		params.put(ConstantPreference.CUSTOMER_NAME, reservation.customerName());
+		params.put(ConstantPreference.SEAT_COUNT, reservation.seatCount());
+
+		String sql = bundle.getSql("Create", params);
 		log.info("Create reservation: {}", sql);
 
 		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {
-			query.addParameter(ConstantPreference.ID, reservation.id().toString())
-					.addParameter(ConstantPreference.EVENT_ID, reservation.eventId().toString())
-					.addParameter(ConstantPreference.CUSTOMER_NAME, reservation.customerName())
-					.addParameter(ConstantPreference.SEAT_COUNT, reservation.seatCount())
-					.executeUpdate();
+			for (Map.Entry<String, Object> entry : params.entrySet()) {
+				query.addParameter(entry.getKey(), entry.getValue());
+			}
+
+			query.executeUpdate();
 		}
 	}
 
 	public Reservation findById(UUID id) {
-		String sql = bundle.getSql("FindById");
-		log.info("Find bt reservation id: {}", sql);
+		Map<String, Object> params = new HashMap<>();
+		params.put(ConstantPreference.ID, id.toString());
+
+		String sql = bundle.getSql("FindById", params);
+		log.info("Find by reservation id: {}", sql);
 
 		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {
-			return query.addParameter(ConstantPreference.ID, id.toString())
-					.executeAndFetchFirst(Reservation.class);
+			for (Map.Entry<String, Object> entry : params.entrySet()) {
+				query.addParameter(entry.getKey(), entry.getValue());
+			}
+
+			return query.executeAndFetchFirst(Reservation.class);
 		}
 	}
 }

@@ -1,5 +1,7 @@
 package com.otis.repository;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
@@ -28,67 +30,53 @@ public class ProductRepository {
 
 	public PageResponse<Product> findByFilters(int page, int size, UUID id, String name, UUID companyId,
 			String companyName) {
-		StringBuilder sql = new StringBuilder(bundle.getSql("FindByFilters"));
-		StringBuilder countSql = new StringBuilder(bundle.getSql("CountByFilters"));
-		String separator = ConstantPreference.WHERE;
+		// 1. Build base filter parameters (only non‑null / non‑blank values)
+		Map<String, Object> filterParams = new HashMap<>();
 
 		if (id != null) {
-			sql.append(separator).append("p.id = :id");
-			countSql.append(separator).append("p.id = :id");
-			separator = ConstantPreference.AND;
+			filterParams.put(ConstantPreference.ID, id.toString());
 		}
 
 		if (name != null && !name.isBlank()) {
-			sql.append(separator).append("p.name LIKE :name");
-			countSql.append(separator).append("p.name LIKE :name");
-			separator = ConstantPreference.AND;
+			filterParams.put(ConstantPreference.NAME, "%" + name + "%");
 		}
 
 		if (companyId != null) {
-			sql.append(separator).append("p.company_id = :companyId");
-			countSql.append(separator).append("p.company_id = :companyId");
-			separator = ConstantPreference.AND;
+			filterParams.put(ConstantPreference.COMPANYID, companyId.toString());
 		}
 
 		if (companyName != null && !companyName.isBlank()) {
-			sql.append(separator).append("c.name LIKE :companyName");
-			countSql.append(separator).append("c.name LIKE :companyName");
+			filterParams.put(ConstantPreference.COMPANY_NAME, "%" + companyName + "%");
 		}
 
+		// 2. Build pagination parameters (for the main query)
 		int offset = page * size;
-		sql.append(" LIMIT :size OFFSET :offset");
+		Map<String, Object> pagingParams = new HashMap<>(filterParams);
+		pagingParams.put(ConstantPreference.SIZE, size);
+		pagingParams.put(ConstantPreference.OFFSET, offset);
 
-		log.info("FindByFilters: {}", sql);
+		// 3. Get the dynamic SQL (ElSql will expand @AND and @PAGING)
+		String findSql = bundle.getSql("FindByFilters", pagingParams);
+		String countSql = bundle.getSql("CountByFilters", filterParams); // count uses only filters
+
+		log.info("FindByFilters: {}", findSql);
 		log.info("CountByFilters: {}", countSql);
 
 		try (Connection conn = sql2o.open()) {
-			Query query = conn.createQuery(sql.toString());
-			Query countQuery = conn.createQuery(countSql.toString());
-
-			if (id != null) {
-				query.addParameter(ConstantPreference.ID, id.toString());
-				countQuery.addParameter(ConstantPreference.ID, id.toString());
+			// Main query
+			Query query = conn.createQuery(findSql);
+			for (Map.Entry<String, Object> entry : pagingParams.entrySet()) {
+				query.addParameter(entry.getKey(), entry.getValue());
 			}
-
-			if (name != null && !name.isBlank()) {
-				query.addParameter(ConstantPreference.NAME, "%" + name + "%");
-				countQuery.addParameter(ConstantPreference.NAME, "%" + name + "%");
-			}
-
-			if (companyId != null) {
-				query.addParameter(ConstantPreference.COMPANYID, companyId.toString());
-				countQuery.addParameter(ConstantPreference.COMPANYID, companyId.toString());
-			}
-
-			if (companyName != null && !companyName.isBlank()) {
-				query.addParameter(ConstantPreference.COMPANY_NAME, "%" + companyName + "%");
-				countQuery.addParameter(ConstantPreference.COMPANY_NAME, "%" + companyName + "%");
-			}
-
-			query.addParameter(ConstantPreference.SIZE, size);
-			query.addParameter(ConstantPreference.OFFSET, offset);
 
 			var products = query.executeAndFetch(Product.class);
+
+			// Count query
+			Query countQuery = conn.createQuery(countSql);
+			for (Map.Entry<String, Object> entry : filterParams.entrySet()) {
+				countQuery.addParameter(entry.getKey(), entry.getValue());
+			}
+
 			long totalElements = countQuery.executeAndFetchFirst(Integer.class);
 
 			int totalPages = (int) Math.ceil((double) totalElements / size);

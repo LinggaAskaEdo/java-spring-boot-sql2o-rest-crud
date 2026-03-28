@@ -1,32 +1,47 @@
 @NAME(FindByEventId)
-    SELECT id, event_id AS eventId, seat_number AS seatNumber, reserved AS reserved, reservation_id AS reservationId
-    FROM seats WHERE event_id = :eventId
+    SELECT id, event_id AS eventId, seat_number AS seatNumber,
+           reserved AS reserved, reservation_id AS reservationId
+    FROM seats
+    WHERE event_id = :eventId
+    ORDER BY seat_number
+    LIMIT :size OFFSET :offset
 
 @NAME(CountByEventId)
-    SELECT COUNT(*) FROM seats WHERE event_id = :eventId
+    SELECT COUNT(*)
+    FROM seats
+    WHERE event_id = :eventId
 
 @NAME(FindAvailableSeats)
-    SELECT id, event_id AS eventId, seat_number AS seatNumber, reserved AS reserved, reservation_id AS reservationId
-    FROM seats WHERE event_id = :eventId AND reserved = FALSE
+    SELECT id, event_id AS eventId, seat_number AS seatNumber,
+           reserved AS reserved, reservation_id AS reservationId
+    FROM seats
+    WHERE event_id = :eventId AND reserved = FALSE
 
 @NAME(FindAndLockAvailableSeats)
-    SELECT id, event_id AS eventId, seat_number AS seatNumber, reserved AS reserved, reservation_id AS reservationId
-    FROM seats WHERE event_id = :eventId AND reserved = FALSE
-    ORDER BY seat_number LIMIT :limit FOR UPDATE SKIP LOCKED
-
-@NAME(LockAndReserveSeat)
-    SELECT id, event_id AS eventId, seat_number AS seatNumber, reserved AS reserved, reservation_id AS reservationId
-    FROM seats WHERE id = :id AND reserved = FALSE
-    FOR UPDATE
-
-@NAME(ReserveSeat)
-    UPDATE seats SET reserved = TRUE, reservation_id = :reservationId WHERE id = :id AND reserved = FALSE
+    SELECT id, event_id AS eventId, seat_number AS seatNumber,
+           reserved AS reserved, reservation_id AS reservationId
+    FROM seats
+    WHERE event_id = :eventId AND reserved = FALSE
+    ORDER BY seat_number
+    LIMIT :limit
+    FOR UPDATE SKIP LOCKED
 
 @NAME(LockSeatById)
-    SELECT id FROM seats WHERE id = :id AND reserved = FALSE FOR UPDATE
+    SELECT id
+    FROM seats
+    WHERE id = :id AND reserved = FALSE
+    FOR UPDATE
 
 @NAME(ReserveSeatById)
-    UPDATE seats SET reserved = TRUE, reservation_id = :reservationId WHERE id = :id
+    UPDATE seats
+    SET reserved = TRUE, reservation_id = :reservationId
+    WHERE id = :id
 
 @NAME(ReleaseSeats)
-    UPDATE seats SET reserved = FALSE, reservation_id = NULL WHERE reservation_id = :reservationId
+    UPDATE seats
+    SET reserved = FALSE, reservation_id = NULL
+    WHERE reservation_id = :reservationId
+
+@NAME(InsertSeat)
+    INSERT INTO seats (id, event_id, seat_number, reserved)
+    VALUES (:id, :eventId, :seatNumber, 0)

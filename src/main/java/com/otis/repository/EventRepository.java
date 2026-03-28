@@ -1,5 +1,7 @@
 package com.otis.repository;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
@@ -12,6 +14,7 @@ import com.opengamma.elsql.ElSqlConfig;
 import com.otis.model.entity.Event;
 import com.otis.model.entity.PageResponse;
 import com.otis.preference.ConstantPreference;
+import com.otis.util.UuidUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,53 +30,46 @@ public class EventRepository {
 	}
 
 	public PageResponse<Event> findByFilters(int page, int size, UUID id, String name, String venue) {
-		StringBuilder sql = new StringBuilder(bundle.getSql("FindByFilters"));
-		StringBuilder countSql = new StringBuilder("SELECT COUNT(*) FROM events");
-		String separator = ConstantPreference.WHERE;
-
+		// Build filter parameters
+		Map<String, Object> filterParams = new HashMap<>();
 		if (id != null) {
-			sql.append(separator).append("id = :id");
-			countSql.append(separator).append("id = :id");
-			separator = ConstantPreference.AND;
+			filterParams.put(ConstantPreference.ID, id.toString());
 		}
 
 		if (name != null && !name.isBlank()) {
-			sql.append(separator).append("name LIKE :name");
-			countSql.append(separator).append("name LIKE :name");
-			separator = ConstantPreference.AND;
+			filterParams.put(ConstantPreference.NAME, "%" + name + "%");
 		}
 
 		if (venue != null && !venue.isBlank()) {
-			sql.append(separator).append("venue LIKE :venue");
-			countSql.append(separator).append("venue LIKE :venue");
+			filterParams.put(ConstantPreference.VENUE, "%" + venue + "%");
 		}
 
+		// Build pagination parameters
 		int offset = page * size;
-		sql.append(" LIMIT :size OFFSET :offset");
+		Map<String, Object> pagingParams = new HashMap<>(filterParams);
+		pagingParams.put(ConstantPreference.SIZE, size);
+		pagingParams.put(ConstantPreference.OFFSET, offset);
 
-		log.info("FindByFilters: {}", sql);
+		// Get dynamic SQL
+		String findSql = bundle.getSql("FindByFilters", pagingParams);
+		String countSql = bundle.getSql("CountByFilters", filterParams);
+
+		log.info("FindByFilters: {}", findSql);
+		log.info("CountByFilters: {}", countSql);
 
 		try (Connection conn = sql2o.open();
-				Query query = conn.createQuery(sql.toString());
-				Query countQuery = conn.createQuery(countSql.toString())) {
+				Query query = conn.createQuery(findSql);
+				Query countQuery = conn.createQuery(countSql)) {
 
-			if (id != null) {
-				query.addParameter(ConstantPreference.ID, id.toString());
-				countQuery.addParameter(ConstantPreference.ID, id.toString());
+			// Bind parameters to main query
+			for (Map.Entry<String, Object> entry : pagingParams.entrySet()) {
+				query.addParameter(entry.getKey(), entry.getValue());
 			}
 
-			if (name != null && !name.isBlank()) {
-				query.addParameter(ConstantPreference.NAME, "%" + name + "%");
-				countQuery.addParameter(ConstantPreference.NAME, "%" + name + "%");
+			// Bind filter parameters to count query
+			for (Map.Entry<String, Object> entry : filterParams.entrySet()) {
+				countQuery.addParameter(entry.getKey(), entry.getValue());
 			}
-
-			if (venue != null && !venue.isBlank()) {
-				query.addParameter(ConstantPreference.VENUE, "%" + venue + "%");
-				countQuery.addParameter(ConstantPreference.VENUE, "%" + venue + "%");
-			}
-
-			query.addParameter(ConstantPreference.SIZE, size);
-			query.addParameter(ConstantPreference.OFFSET, offset);
 
 			var events = query.executeAndFetch(Event.class);
 			long totalElements = countQuery.executeAndFetchFirst(Integer.class);
@@ -99,6 +95,7 @@ public class EventRepository {
 		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {
 			Integer count = query.addParameter(ConstantPreference.EVENT_ID, eventId.toString())
 					.executeAndFetchFirst(Integer.class);
+
 			return count != null ? count : 0;
 		}
 	}
@@ -109,6 +106,33 @@ public class EventRepository {
 			Integer count = query.addParameter(ConstantPreference.EVENT_ID, eventId.toString())
 					.executeAndFetchFirst(Integer.class);
 			return count != null ? count : 0;
+		}
+	}
+
+	public int countEvents() {
+		String sql = bundle.getSql("CountEvents");
+		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {
+			Integer count = query.executeAndFetchFirst(Integer.class);
+			return count != null ? count : 0;
+		}
+	}
+
+	public void insertEvent(UUID id, String name, String venue) {
+		String sql = bundle.getSql("InsertEvent");
+		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {
+			query.addParameter(ConstantPreference.ID, id.toString())
+					.addParameter(ConstantPreference.NAME, name)
+					.addParameter(ConstantPreference.VENUE, venue)
+					.executeUpdate();
+		}
+	}
+
+	public UUID findFirstEventId() {
+		String sql = bundle.getSql("FindFirstEvent");
+		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {
+			String idStr = query.executeAndFetchFirst(String.class);
+
+			return idStr != null ? UuidUtils.parseUUID(idStr) : null;
 		}
 	}
 }

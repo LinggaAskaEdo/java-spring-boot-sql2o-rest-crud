@@ -1,5 +1,7 @@
 package com.otis.repository;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
@@ -27,45 +29,41 @@ public class CompanyRepository {
 	}
 
 	public PageResponse<Company> findByFilters(int page, int size, UUID id, String name) {
-		StringBuilder sql = new StringBuilder(bundle.getSql("FindByFilters"));
-		StringBuilder countSql = new StringBuilder(bundle.getSql("CountByFilters"));
-		String separator = ConstantPreference.WHERE;
-
+		// 1. Build filter parameters
+		Map<String, Object> filterParams = new HashMap<>();
 		if (id != null) {
-			sql.append(separator).append("id = :id");
-			countSql.append(separator).append("id = :id");
-			separator = ConstantPreference.AND;
+			filterParams.put(ConstantPreference.ID, id.toString());
 		}
-
 		if (name != null && !name.isBlank()) {
-			sql.append(separator).append("name LIKE :name");
-			countSql.append(separator).append("name LIKE :name");
+			filterParams.put(ConstantPreference.NAME, "%" + name + "%");
 		}
 
+		// 2. Build pagination parameters
 		int offset = page * size;
-		sql.append(" LIMIT :size OFFSET :offset");
+		Map<String, Object> pagingParams = new HashMap<>(filterParams);
+		pagingParams.put(ConstantPreference.SIZE, size);
+		pagingParams.put(ConstantPreference.OFFSET, offset);
 
-		log.info("FindByFilters: {}", sql);
+		// 3. Get the dynamic SQL
+		String findSql = bundle.getSql("FindByFilters", pagingParams);
+		String countSql = bundle.getSql("CountByFilters", filterParams); // count uses only filters
+
+		log.info("FindByFilters: {}", findSql);
 		log.info("CountByFilters: {}", countSql);
 
 		try (Connection conn = sql2o.open()) {
-			Query query = conn.createQuery(sql.toString());
-			Query countQuery = conn.createQuery(countSql.toString());
-
-			if (id != null) {
-				query.addParameter(ConstantPreference.ID, id.toString());
-				countQuery.addParameter(ConstantPreference.ID, id.toString());
+			// Main query
+			Query query = conn.createQuery(findSql);
+			for (Map.Entry<String, Object> entry : pagingParams.entrySet()) {
+				query.addParameter(entry.getKey(), entry.getValue());
 			}
-
-			if (name != null && !name.isBlank()) {
-				query.addParameter(ConstantPreference.NAME, "%" + name + "%");
-				countQuery.addParameter(ConstantPreference.NAME, "%" + name + "%");
-			}
-
-			query.addParameter(ConstantPreference.SIZE, size);
-			query.addParameter(ConstantPreference.OFFSET, offset);
-
 			var companies = query.executeAndFetch(Company.class);
+
+			// Count query
+			Query countQuery = conn.createQuery(countSql);
+			for (Map.Entry<String, Object> entry : filterParams.entrySet()) {
+				countQuery.addParameter(entry.getKey(), entry.getValue());
+			}
 			long totalElements = countQuery.executeAndFetchFirst(Integer.class);
 
 			int totalPages = (int) Math.ceil((double) totalElements / size);

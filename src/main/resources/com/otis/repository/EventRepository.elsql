@@ -1,11 +1,50 @@
 @NAME(FindByFilters)
-    SELECT id, name, venue FROM events WHERE 1=1
+    SELECT id, name, venue
+    FROM events
+    WHERE 1=1
+      @AND(:id)
+        AND id = :id
+      @AND(:name)
+        AND name LIKE :name
+      @AND(:venue)
+        AND venue LIKE :venue
+    LIMIT :size OFFSET :offset
+
+@NAME(CountByFilters)
+    SELECT COUNT(*)
+    FROM events
+    WHERE 1=1
+      @AND(:id)
+        AND id = :id
+      @AND(:name)
+        AND name LIKE :name
+      @AND(:venue)
+        AND venue LIKE :venue
 
 @NAME(FindById)
-    SELECT id, name, venue FROM events WHERE id = :id
+    SELECT id, name, venue
+    FROM events
+    WHERE id = :id
+
+@NAME(CountEvents)
+    SELECT COUNT(*)
+    FROM events
+
+@NAME(InsertEvent)
+    INSERT INTO events (id, name, venue)
+    VALUES (:id, :name, :venue)
+
+@NAME(FindFirstEvent)
+    SELECT id
+    FROM events
+    LIMIT 1
 
 @NAME(CountAvailableSeats)
-    SELECT COUNT(*) FROM seats WHERE event_id = :eventId AND reserved = FALSE
+    SELECT COUNT(*)
+    FROM seats
+    WHERE event_id = :eventId AND reserved = FALSE
 
 @NAME(CountTotalSeats)
-    SELECT COUNT(*) FROM seats WHERE event_id = :eventId
+    SELECT COUNT(*)
+    FROM seats
+    WHERE event_id = :eventId

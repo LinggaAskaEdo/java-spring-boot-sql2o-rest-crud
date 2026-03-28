@@ -1,5 +1,18 @@
 @NAME(FindByFilters)
-    SELECT id, name FROM company
+    SELECT id, name
+    FROM company
+    WHERE 1=1
+      @AND(:id)
+        AND id = :id
+      @AND(:name)
+        AND name LIKE :name
+    LIMIT :size OFFSET :offset
 
 @NAME(CountByFilters)
-    SELECT COUNT(*) FROM company
+    SELECT COUNT(*)
+    FROM company
+    WHERE 1=1
+      @AND(:id)
+        AND id = :id
+      @AND(:name)
+        AND name LIKE :name

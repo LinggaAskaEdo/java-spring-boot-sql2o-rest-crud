@@ -3,9 +3,28 @@
     FROM products p
         INNER JOIN products_company pc ON p.id = pc.product_id
         INNER JOIN company c ON c.id = pc.company_id
+    WHERE 1=1
+      @AND(:id)
+        AND p.id = :id
+      @AND(:name)
+        AND p.name LIKE :name
+      @AND(:companyId)
+        AND p.company_id = :companyId
+      @AND(:companyName)
+        AND c.name LIKE :companyName
+    LIMIT :size OFFSET :offset
 
 @NAME(CountByFilters)
     SELECT COUNT(DISTINCT p.id)
     FROM products p
         INNER JOIN products_company pc ON p.id = pc.product_id
         INNER JOIN company c ON c.id = pc.company_id
+    WHERE 1=1
+      @AND(:id)
+        AND p.id = :id
+      @AND(:name)
+        AND p.name LIKE :name
+      @AND(:companyId)
+        AND p.company_id = :companyId
+      @AND(:companyName)
+        AND c.name LIKE :companyName
