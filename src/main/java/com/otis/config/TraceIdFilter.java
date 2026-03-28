@@ -51,7 +51,7 @@ public class TraceIdFilter extends OncePerRequestFilter {
 		LoggingResponseWrapper loggingWrapper = new LoggingResponseWrapper(response);
 
 		try {
-			filterChain.doFilter(request, loggingWrapper);
+			filterChain.doFilter(request, response);
 		} finally {
 			long processTime = System.currentTimeMillis() - startTime;
 			int status = loggingWrapper.getStatus();
@@ -63,6 +63,7 @@ public class TraceIdFilter extends OncePerRequestFilter {
 					String charset = loggingWrapper.getCharacterEncoding();
 					if (charset == null)
 						charset = "UTF-8";
+
 					String bodyString = new String(responseBody, charset);
 
 					// Truncate very long bodies to avoid log flooding
