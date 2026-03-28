@@ -735,11 +735,31 @@ The rate limiter successfully enforces per-tier limits across all API keys:
 | Premium | 10               | 3,500 - 7,500  | ~99-100%     |
 | General | 1                | 3,700 - 7,000  | ~99-100%     |
 
-### Detailed Report
+### Overview
 
-![Stress Test Report](etc/image/report.png)
+![Overview](etc/image/01-overview.png)
 
-Full report available at: `reports/20260329_060541/report.html`
+### /api/products Results
+
+![Products](etc/image/02-products.png)
+
+### /api/companies Results
+
+![Companies](etc/image/03-companies.png)
+
+### /api/tutorials Results
+
+![Tutorials](etc/image/04-tutorials.png)
+
+### /api/events Results
+
+![Events](etc/image/05-events.png)
+
+### Summary
+
+![Summary](etc/image/06-summary.png)
+
+Full report available at: `reports/20260329_061559/report.html`
 
 ## License
 
