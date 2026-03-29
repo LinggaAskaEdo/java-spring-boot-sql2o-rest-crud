@@ -125,27 +125,6 @@ class EventControllerTest {
 	}
 
 	@Test
-	void getEventById_WhenExists_ReturnsOk() throws Exception {
-		when(eventService.findById(eventId)).thenReturn(event);
-
-		mockMvc.perform(get("/api/events/{id}", eventId)
-				.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id").value(eventId.toString()))
-				.andExpect(jsonPath("$.name").value("Test Event"))
-				.andExpect(jsonPath("$.venue").value("Test Venue"));
-	}
-
-	@Test
-	void getEventById_WhenNotExists_ReturnsNotFound() throws Exception {
-		when(eventService.findById(any())).thenReturn(null);
-
-		mockMvc.perform(get("/api/events/{id}", UUID.randomUUID())
-				.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isNotFound());
-	}
-
-	@Test
 	void getAvailableSeats_ReturnsOk() throws Exception {
 		when(eventService.getAvailableSeats(eventId)).thenReturn(50);
 		when(eventService.getTotalSeats(eventId)).thenReturn(100);

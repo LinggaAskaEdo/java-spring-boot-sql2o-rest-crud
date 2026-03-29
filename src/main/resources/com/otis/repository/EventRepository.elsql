@@ -21,11 +21,6 @@
       @AND(:venue)
         AND venue LIKE :venue
 
-@NAME(FindById)
-    SELECT id, name, venue
-    FROM events
-    WHERE id = :id
-
 @NAME(CountEvents)
     SELECT COUNT(*)
     FROM events

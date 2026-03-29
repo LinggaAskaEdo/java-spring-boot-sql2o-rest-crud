@@ -19,7 +19,7 @@
   "java.project.referencedLibraries": ["target/**/*.jar", "lib/**/*.jar"],
   "java.configuration.updateBuildConfiguration": "automatic",
   "java.compile.nullAnalysis.mode": "automatic",
-  "java.jdt.ls.vmargs": "-Xmx8G",
+  "java.jdt.ls.vmargs": "-Xmx4G",
 
   "yaml.validate": false,
 

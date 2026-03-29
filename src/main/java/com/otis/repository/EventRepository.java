@@ -82,14 +82,6 @@ public class EventRepository {
 		}
 	}
 
-	public Event findById(UUID id) {
-		String sql = bundle.getSql("FindById");
-		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {
-			return query.addParameter(ConstantPreference.ID, id.toString())
-					.executeAndFetchFirst(Event.class);
-		}
-	}
-
 	public int countAvailableSeats(UUID eventId) {
 		String sql = bundle.getSql("CountAvailableSeats");
 		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {

@@ -36,16 +36,6 @@ public class EventController {
 		return ResponseEntity.ok(eventService.findByFilters(page, size, id, name, venue));
 	}
 
-	@GetMapping("/events/{id}")
-	public ResponseEntity<Event> getEventById(@PathVariable UUID id) {
-		Event event = eventService.findById(id);
-		if (event == null) {
-			return ResponseEntity.notFound().build();
-		}
-
-		return ResponseEntity.ok(event);
-	}
-
 	@GetMapping("/events/{id}/seats/available")
 	public ResponseEntity<SeatAvailability> getAvailableSeats(@PathVariable UUID id) {
 		int available = eventService.getAvailableSeats(id);

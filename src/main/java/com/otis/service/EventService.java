@@ -28,11 +28,6 @@ public class EventService {
 				() -> eventRepository.findByFilters(page, size, id, name, venue), "findByFilters");
 	}
 
-	public Event findById(UUID id) {
-		return BulkheadUtils.withBulkhead(bulkhead,
-				() -> eventRepository.findById(id), "findById");
-	}
-
 	public int getAvailableSeats(UUID eventId) {
 		return BulkheadUtils.withBulkhead(bulkhead,
 				() -> eventRepository.countAvailableSeats(eventId), "countAvailableSeats");

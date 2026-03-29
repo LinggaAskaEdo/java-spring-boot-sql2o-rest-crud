@@ -34,6 +34,7 @@ public class CompanyRepository {
 		if (id != null) {
 			filterParams.put(ConstantPreference.ID, id.toString());
 		}
+
 		if (name != null && !name.isBlank()) {
 			filterParams.put(ConstantPreference.NAME, "%" + name + "%");
 		}
@@ -57,6 +58,7 @@ public class CompanyRepository {
 			for (Map.Entry<String, Object> entry : pagingParams.entrySet()) {
 				query.addParameter(entry.getKey(), entry.getValue());
 			}
+
 			var companies = query.executeAndFetch(Company.class);
 
 			// Count query
@@ -64,6 +66,7 @@ public class CompanyRepository {
 			for (Map.Entry<String, Object> entry : filterParams.entrySet()) {
 				countQuery.addParameter(entry.getKey(), entry.getValue());
 			}
+
 			long totalElements = countQuery.executeAndFetchFirst(Integer.class);
 
 			int totalPages = (int) Math.ceil((double) totalElements / size);

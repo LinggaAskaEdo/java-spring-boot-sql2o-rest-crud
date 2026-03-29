@@ -6,8 +6,6 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
@@ -108,51 +106,6 @@ class EventServiceTest {
 
 			assertEquals(0, result.totalElements());
 			assertEquals(0, result.content().size());
-		}
-	}
-
-	@Test
-	@SuppressWarnings("unchecked")
-	void findById_WhenEventExists_ReturnsEvent() {
-		UUID eventId = UUID.randomUUID();
-		Event event = new Event(eventId, "Test Event", "Test Venue");
-
-		when(eventRepository.findById(eventId)).thenReturn(event);
-
-		try (var mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils
-					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
-					.thenAnswer(invocation -> {
-						Supplier<?> supplier = invocation.getArgument(1);
-						return supplier.get();
-					});
-
-			Event result = eventService.findById(eventId);
-
-			assertNotNull(result);
-			assertEquals(eventId, result.id());
-			assertEquals("Test Event", result.name());
-		}
-	}
-
-	@Test
-	@SuppressWarnings("unchecked")
-	void findById_WhenEventNotExists_ReturnsNull() {
-		UUID eventId = UUID.randomUUID();
-
-		when(eventRepository.findById(eventId)).thenReturn(null);
-
-		try (var mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils
-					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
-					.thenAnswer(invocation -> {
-						Supplier<?> supplier = invocation.getArgument(1);
-						return supplier.get();
-					});
-
-			Event result = eventService.findById(eventId);
-
-			assertNull(result);
 		}
 	}
 
