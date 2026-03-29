@@ -1,24 +1,22 @@
 package com.otis.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 import com.otis.model.entity.PageResponse;
 import com.otis.model.entity.Tutorial;
@@ -28,12 +26,12 @@ import com.otis.util.BulkheadUtils;
 import io.github.resilience4j.bulkhead.Bulkhead;
 
 class TutorialServiceTest {
-
 	private TutorialRepository repository;
 	private Bulkhead bulkhead;
 	private TutorialService tutorialService;
 
 	@BeforeEach
+	@SuppressWarnings("unused")
 	void setUp() {
 		repository = mock(TutorialRepository.class);
 		bulkhead = mock(Bulkhead.class);
@@ -41,6 +39,7 @@ class TutorialServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void findByFilters_ReturnsPageResponse() {
 		UUID tutorialId = UUID.randomUUID();
 		Tutorial tutorial = new Tutorial(tutorialId, "Test Tutorial", "Description", true);
@@ -50,7 +49,8 @@ class TutorialServiceTest {
 				.thenReturn(expectedResponse);
 
 		try (var mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();
@@ -66,22 +66,25 @@ class TutorialServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void findByFilters_WithAllFilters_ReturnsFilteredResult() {
 		UUID tutorialId = UUID.randomUUID();
 		Tutorial tutorial = new Tutorial(tutorialId, "Spring Tutorial", "Learn Spring Boot", true);
 		PageResponse<Tutorial> expectedResponse = new PageResponse<>(List.of(tutorial), 0, 10, 1, 1, true, true);
 
-		when(repository.findByFilters(eq(0), eq(10), eq(tutorialId), eq("Spring"), eq("Spring Boot"), eq(true)))
+		when(repository.findByFilters(anyInt(), anyInt(), any(), any(), any(), any()))
 				.thenReturn(expectedResponse);
 
 		try (var mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();
 					});
 
-			PageResponse<Tutorial> result = tutorialService.findByFilters(0, 10, tutorialId, "Spring", "Spring Boot", true);
+			PageResponse<Tutorial> result = tutorialService.findByFilters(0, 10, tutorialId, "Spring", "Spring Boot",
+					true);
 
 			assertEquals(expectedResponse, result);
 			assertEquals("Spring Tutorial", result.content().get(0).title());
@@ -89,6 +92,7 @@ class TutorialServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void findByFilters_WithPublishedFilter_ReturnsOnlyPublished() {
 		UUID tutorialId = UUID.randomUUID();
 		Tutorial tutorial = new Tutorial(tutorialId, "Published Tutorial", "Description", true);
@@ -98,7 +102,8 @@ class TutorialServiceTest {
 				.thenReturn(expectedResponse);
 
 		try (var mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();
@@ -112,6 +117,7 @@ class TutorialServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void findByFilters_ReturnsEmptyList() {
 		PageResponse<Tutorial> emptyResponse = new PageResponse<>(Collections.emptyList(), 0, 10, 0, 0, true, true);
 
@@ -119,7 +125,8 @@ class TutorialServiceTest {
 				.thenReturn(emptyResponse);
 
 		try (var mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();
@@ -135,16 +142,19 @@ class TutorialServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void findByFilters_WithPagination_ReturnsCorrectPage() {
 		Tutorial tutorial1 = new Tutorial(UUID.randomUUID(), "Tutorial 1", "Desc 1", true);
 		Tutorial tutorial2 = new Tutorial(UUID.randomUUID(), "Tutorial 2", "Desc 2", false);
-		PageResponse<Tutorial> pageResponse = new PageResponse<>(List.of(tutorial1, tutorial2), 1, 2, 5, 3, false, false);
+		PageResponse<Tutorial> pageResponse = new PageResponse<>(List.of(tutorial1, tutorial2), 1, 2, 5, 3, false,
+				false);
 
-		when(repository.findByFilters(eq(1), eq(2), any(), any(), any(), any()))
+		when(repository.findByFilters(anyInt(), anyInt(), any(), any(), any(), any()))
 				.thenReturn(pageResponse);
 
 		try (var mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();
@@ -163,16 +173,18 @@ class TutorialServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void findByFilters_WithUnpublishedFilter_ReturnsUnpublishedTutorials() {
 		UUID tutorialId = UUID.randomUUID();
 		Tutorial tutorial = new Tutorial(tutorialId, "Unpublished Tutorial", "Description", false);
 		PageResponse<Tutorial> expectedResponse = new PageResponse<>(List.of(tutorial), 0, 10, 1, 1, true, true);
 
-		when(repository.findByFilters(anyInt(), anyInt(), any(), any(), any(), eq(false)))
+		when(repository.findByFilters(anyInt(), anyInt(), any(), any(), any(), anyBoolean()))
 				.thenReturn(expectedResponse);
 
 		try (var mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();

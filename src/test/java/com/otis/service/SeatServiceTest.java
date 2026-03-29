@@ -1,24 +1,23 @@
 package com.otis.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.MockedStatic;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.otis.model.entity.PageResponse;
 import com.otis.model.entity.Seat;
@@ -29,13 +28,13 @@ import com.otis.util.BulkheadUtils;
 import io.github.resilience4j.bulkhead.Bulkhead;
 
 class SeatServiceTest {
-
 	private SeatRepository seatRepository;
 	private ReservationRepository reservationRepository;
 	private Bulkhead bulkhead;
 	private SeatService seatService;
 
 	@BeforeEach
+	@SuppressWarnings("unused")
 	void setUp() {
 		seatRepository = mock(SeatRepository.class);
 		reservationRepository = mock(ReservationRepository.class);
@@ -44,6 +43,7 @@ class SeatServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void findByEventId_ReturnsPageResponse() {
 		UUID eventId = UUID.randomUUID();
 		UUID seatId = UUID.randomUUID();
@@ -53,7 +53,8 @@ class SeatServiceTest {
 		when(seatRepository.findByEventId(anyInt(), anyInt(), any())).thenReturn(expectedResponse);
 
 		try (MockedStatic<BulkheadUtils> mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();
@@ -68,6 +69,7 @@ class SeatServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void findByEventId_ReturnsEmptyList() {
 		UUID eventId = UUID.randomUUID();
 		PageResponse<Seat> emptyResponse = new PageResponse<>(Collections.emptyList(), 0, 20, 0, 0, true, true);
@@ -75,7 +77,8 @@ class SeatServiceTest {
 		when(seatRepository.findByEventId(anyInt(), anyInt(), any())).thenReturn(emptyResponse);
 
 		try (MockedStatic<BulkheadUtils> mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();
@@ -89,6 +92,7 @@ class SeatServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void findByEventId_WithPagination_ReturnsCorrectPage() {
 		UUID eventId = UUID.randomUUID();
 		Seat seat = new Seat(UUID.randomUUID(), eventId, "A1", false, null);
@@ -97,7 +101,8 @@ class SeatServiceTest {
 		when(seatRepository.findByEventId(anyInt(), anyInt(), any())).thenReturn(pageResponse);
 
 		try (MockedStatic<BulkheadUtils> mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();
@@ -115,13 +120,15 @@ class SeatServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void cancelReservation_WhenSuccessful_ReturnsTrue() {
 		UUID reservationId = UUID.randomUUID();
 
 		when(seatRepository.releaseSeats(reservationId)).thenReturn(true);
 
 		try (MockedStatic<BulkheadUtils> mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();
@@ -134,13 +141,15 @@ class SeatServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void cancelReservation_WhenNotFound_ReturnsFalse() {
 		UUID reservationId = UUID.randomUUID();
 
 		when(seatRepository.releaseSeats(reservationId)).thenReturn(false);
 
 		try (MockedStatic<BulkheadUtils> mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();
@@ -153,13 +162,15 @@ class SeatServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void cancelReservation_CallsReleaseSeats() {
 		UUID reservationId = UUID.randomUUID();
 
 		when(seatRepository.releaseSeats(reservationId)).thenReturn(true);
 
 		try (MockedStatic<BulkheadUtils> mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();

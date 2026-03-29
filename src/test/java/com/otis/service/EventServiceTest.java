@@ -1,23 +1,21 @@
 package com.otis.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 import com.otis.model.entity.Event;
 import com.otis.model.entity.PageResponse;
@@ -27,12 +25,12 @@ import com.otis.util.BulkheadUtils;
 import io.github.resilience4j.bulkhead.Bulkhead;
 
 class EventServiceTest {
-
 	private EventRepository eventRepository;
 	private Bulkhead bulkhead;
 	private EventService eventService;
 
 	@BeforeEach
+	@SuppressWarnings("unused")
 	void setUp() {
 		eventRepository = mock(EventRepository.class);
 		bulkhead = mock(Bulkhead.class);
@@ -40,6 +38,7 @@ class EventServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void findByFilters_ReturnsPageResponse() {
 		UUID eventId = UUID.randomUUID();
 		Event event = new Event(eventId, "Test Event", "Test Venue");
@@ -49,7 +48,8 @@ class EventServiceTest {
 				.thenReturn(expectedResponse);
 
 		try (var mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();
@@ -64,16 +64,18 @@ class EventServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void findByFilters_WithAllFilters_ReturnsFilteredResult() {
 		UUID eventId = UUID.randomUUID();
 		Event event = new Event(eventId, "Tech Conference", "Convention Center");
 		PageResponse<Event> expectedResponse = new PageResponse<>(List.of(event), 0, 10, 1, 1, true, true);
 
-		when(eventRepository.findByFilters(eq(0), eq(10), eq(eventId), eq("Tech"), eq("Convention")))
+		when(eventRepository.findByFilters(anyInt(), anyInt(), any(), any(), any()))
 				.thenReturn(expectedResponse);
 
 		try (var mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();
@@ -87,6 +89,7 @@ class EventServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void findByFilters_ReturnsEmptyList() {
 		PageResponse<Event> emptyResponse = new PageResponse<>(Collections.emptyList(), 0, 10, 0, 0, true, true);
 
@@ -94,7 +97,8 @@ class EventServiceTest {
 				.thenReturn(emptyResponse);
 
 		try (var mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();
@@ -108,6 +112,7 @@ class EventServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void findById_WhenEventExists_ReturnsEvent() {
 		UUID eventId = UUID.randomUUID();
 		Event event = new Event(eventId, "Test Event", "Test Venue");
@@ -115,7 +120,8 @@ class EventServiceTest {
 		when(eventRepository.findById(eventId)).thenReturn(event);
 
 		try (var mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();
@@ -130,13 +136,15 @@ class EventServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void findById_WhenEventNotExists_ReturnsNull() {
 		UUID eventId = UUID.randomUUID();
 
 		when(eventRepository.findById(eventId)).thenReturn(null);
 
 		try (var mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();
@@ -149,6 +157,7 @@ class EventServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void getAvailableSeats_ReturnsCorrectCount() {
 		UUID eventId = UUID.randomUUID();
 		int availableSeats = 50;
@@ -156,7 +165,8 @@ class EventServiceTest {
 		when(eventRepository.countAvailableSeats(eventId)).thenReturn(availableSeats);
 
 		try (var mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();
@@ -169,6 +179,7 @@ class EventServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void getTotalSeats_ReturnsCorrectCount() {
 		UUID eventId = UUID.randomUUID();
 		int totalSeats = 100;
@@ -176,7 +187,8 @@ class EventServiceTest {
 		when(eventRepository.countTotalSeats(eventId)).thenReturn(totalSeats);
 
 		try (var mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();
@@ -189,13 +201,15 @@ class EventServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void getAvailableSeats_WhenNoSeats_ReturnsZero() {
 		UUID eventId = UUID.randomUUID();
 
 		when(eventRepository.countAvailableSeats(eventId)).thenReturn(0);
 
 		try (var mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();

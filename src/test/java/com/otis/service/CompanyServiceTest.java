@@ -1,6 +1,13 @@
 package com.otis.service;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import java.util.function.Supplier;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -8,14 +15,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-import java.util.function.Supplier;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import com.otis.model.entity.Company;
 import com.otis.model.entity.PageResponse;
@@ -25,12 +24,12 @@ import com.otis.util.BulkheadUtils;
 import io.github.resilience4j.bulkhead.Bulkhead;
 
 class CompanyServiceTest {
-
 	private CompanyRepository repository;
 	private Bulkhead bulkhead;
 	private CompanyService companyService;
 
 	@BeforeEach
+	@SuppressWarnings("unused")
 	void setUp() {
 		repository = mock(CompanyRepository.class);
 		bulkhead = mock(Bulkhead.class);
@@ -38,6 +37,7 @@ class CompanyServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void findByFilters_ReturnsPageResponse() {
 		UUID companyId = UUID.randomUUID();
 		Company company = new Company(companyId, "Test Company");
@@ -47,7 +47,8 @@ class CompanyServiceTest {
 				.thenReturn(expectedResponse);
 
 		try (var mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();
@@ -62,6 +63,7 @@ class CompanyServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void findByFilters_WithIdFilter_ReturnsFilteredResult() {
 		UUID companyId = UUID.randomUUID();
 		Company company = new Company(companyId, "Test Company");
@@ -71,7 +73,8 @@ class CompanyServiceTest {
 				.thenReturn(expectedResponse);
 
 		try (var mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();
@@ -85,6 +88,7 @@ class CompanyServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void findByFilters_WithNameFilter_ReturnsFilteredResult() {
 		UUID companyId = UUID.randomUUID();
 		Company company = new Company(companyId, "Test Company");
@@ -94,7 +98,8 @@ class CompanyServiceTest {
 				.thenReturn(expectedResponse);
 
 		try (var mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();
@@ -108,6 +113,7 @@ class CompanyServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void findByFilters_ReturnsEmptyList() {
 		PageResponse<Company> emptyResponse = new PageResponse<>(Collections.emptyList(), 0, 10, 0, 0, true, true);
 
@@ -115,7 +121,8 @@ class CompanyServiceTest {
 				.thenReturn(emptyResponse);
 
 		try (var mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();
@@ -129,6 +136,7 @@ class CompanyServiceTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void findByFilters_WithPagination_ReturnsCorrectPage() {
 		Company company = new Company(UUID.randomUUID(), "Test Company");
 		PageResponse<Company> pageResponse = new PageResponse<>(List.of(company), 1, 5, 10, 2, false, false);
@@ -137,7 +145,8 @@ class CompanyServiceTest {
 				.thenReturn(pageResponse);
 
 		try (var mockedBulkheadUtils = mockStatic(BulkheadUtils.class)) {
-			mockedBulkheadUtils.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
+			mockedBulkheadUtils
+					.when(() -> BulkheadUtils.withBulkhead(any(Bulkhead.class), any(Supplier.class), anyString()))
 					.thenAnswer(invocation -> {
 						Supplier<?> supplier = invocation.getArgument(1);
 						return supplier.get();

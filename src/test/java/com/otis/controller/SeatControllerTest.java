@@ -22,7 +22,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.otis.model.entity.PageResponse;
-import com.otis.model.entity.Reservation;
 import com.otis.model.entity.Seat;
 import com.otis.service.SeatService;
 
@@ -37,20 +36,17 @@ class SeatControllerTest {
 	private SeatController seatController;
 
 	private UUID eventId;
-	private UUID seatId;
 	private UUID reservationId;
 	private Seat seat;
-	private Reservation reservation;
 	private PageResponse<Seat> pageResponse;
 
 	@BeforeEach
+	@SuppressWarnings("unused")
 	void setUp() {
 		mockMvc = MockMvcBuilders.standaloneSetup(seatController).build();
 		eventId = UUID.randomUUID();
-		seatId = UUID.randomUUID();
 		reservationId = UUID.randomUUID();
-		seat = new Seat(seatId, eventId, "A1", false, null);
-		reservation = new Reservation(reservationId, eventId, "John Doe", 3);
+		seat = new Seat(UUID.randomUUID(), eventId, "A1", false, null);
 		pageResponse = new PageResponse<>(List.of(seat), 0, 20, 1, 1, true, true);
 	}
 
