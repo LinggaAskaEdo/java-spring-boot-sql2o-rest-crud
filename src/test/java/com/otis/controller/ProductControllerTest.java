@@ -41,6 +41,7 @@ class ProductControllerTest {
 	private PageResponse<Product> pageResponse;
 
 	@BeforeEach
+	@SuppressWarnings("unused")
 	void setUp() {
 		mockMvc = MockMvcBuilders.standaloneSetup(productController).build();
 		companyId = UUID.randomUUID();

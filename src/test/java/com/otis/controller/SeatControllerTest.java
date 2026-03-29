@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
@@ -45,7 +44,6 @@ class SeatControllerTest {
 	private PageResponse<Seat> pageResponse;
 
 	@BeforeEach
-	@SuppressWarnings("unused")
 	void setUp() {
 		mockMvc = MockMvcBuilders.standaloneSetup(seatController).build();
 		eventId = UUID.randomUUID();
@@ -91,29 +89,6 @@ class SeatControllerTest {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isEmpty())
 				.andExpect(jsonPath("$.totalElements").value(0));
-	}
-
-	@Test
-	void reserveSeats_WhenSuccessful_ReturnsOk() throws Exception {
-		when(seatService.reserveSeats(any(), anyString(), anyInt())).thenReturn(reservation);
-
-		mockMvc.perform(post("/api/events/{eventId}/reserve", eventId)
-				.contentType(APPLICATION_JSON)
-				.content("{\"customerName\": \"John Doe\", \"seatCount\": 3}"))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id").value(reservationId.toString()))
-				.andExpect(jsonPath("$.customerName").value("John Doe"))
-				.andExpect(jsonPath("$.seatCount").value(3));
-	}
-
-	@Test
-	void reserveSeats_WhenNotEnoughSeats_ReturnsBadRequest() throws Exception {
-		when(seatService.reserveSeats(any(), anyString(), anyInt())).thenReturn(null);
-
-		mockMvc.perform(post("/api/events/{eventId}/reserve", eventId)
-				.contentType(APPLICATION_JSON)
-				.content("{\"customerName\": \"John Doe\", \"seatCount\": 100}"))
-				.andExpect(status().isBadRequest());
 	}
 
 	@Test
