@@ -1,13 +1,5 @@
 package com.otis.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -15,11 +7,18 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.otis.model.entity.Company;
@@ -28,7 +27,6 @@ import com.otis.service.CompanyService;
 
 @ExtendWith(MockitoExtension.class)
 class CompanyControllerTest {
-
 	private MockMvc mockMvc;
 
 	@Mock
@@ -42,6 +40,7 @@ class CompanyControllerTest {
 	private PageResponse<Company> pageResponse;
 
 	@BeforeEach
+	@SuppressWarnings("unused")
 	void setUp() {
 		mockMvc = MockMvcBuilders.standaloneSetup(companyController).build();
 		companyId = UUID.randomUUID();
@@ -55,7 +54,7 @@ class CompanyControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/companies")
-						.contentType(MediaType.APPLICATION_JSON))
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isArray())
 				.andExpect(jsonPath("$.content[0].name").value("Test Company"))
@@ -69,9 +68,9 @@ class CompanyControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/companies")
-						.param("page", "0")
-						.param("size", "10")
-						.contentType(MediaType.APPLICATION_JSON))
+				.param("page", "0")
+				.param("size", "10")
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isArray());
 	}
@@ -82,8 +81,8 @@ class CompanyControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/companies")
-						.param("id", companyId.toString())
-						.contentType(MediaType.APPLICATION_JSON))
+				.param("id", companyId.toString())
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content[0].id").value(companyId.toString()));
 	}
@@ -94,8 +93,8 @@ class CompanyControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/companies")
-						.param("name", "Test Company")
-						.contentType(MediaType.APPLICATION_JSON))
+				.param("name", "Test Company")
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content[0].name").value("Test Company"));
 	}
@@ -107,7 +106,7 @@ class CompanyControllerTest {
 				.thenReturn(emptyResponse);
 
 		mockMvc.perform(get("/api/companies")
-						.contentType(MediaType.APPLICATION_JSON))
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isEmpty())
 				.andExpect(jsonPath("$.totalElements").value(0));
@@ -119,11 +118,11 @@ class CompanyControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/companies")
-						.param("page", "0")
-						.param("size", "10")
-						.param("id", companyId.toString())
-						.param("name", "Test Company")
-						.contentType(MediaType.APPLICATION_JSON))
+				.param("page", "0")
+				.param("size", "10")
+				.param("id", companyId.toString())
+				.param("name", "Test Company")
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content[0].name").value("Test Company"));
 	}

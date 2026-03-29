@@ -1,14 +1,5 @@
 package com.otis.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -16,11 +7,19 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.otis.model.entity.PageResponse;
@@ -29,7 +28,6 @@ import com.otis.service.TutorialService;
 
 @ExtendWith(MockitoExtension.class)
 class TutorialControllerTest {
-
 	private MockMvc mockMvc;
 
 	@Mock
@@ -43,6 +41,7 @@ class TutorialControllerTest {
 	private PageResponse<Tutorial> pageResponse;
 
 	@BeforeEach
+	@SuppressWarnings("unused")
 	void setUp() {
 		mockMvc = MockMvcBuilders.standaloneSetup(tutorialController).build();
 		tutorialId = UUID.randomUUID();
@@ -56,7 +55,7 @@ class TutorialControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/tutorials")
-						.contentType(MediaType.APPLICATION_JSON))
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isArray())
 				.andExpect(jsonPath("$.content[0].title").value("Test Tutorial"))
@@ -70,9 +69,9 @@ class TutorialControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/tutorials")
-						.param("page", "0")
-						.param("size", "10")
-						.contentType(MediaType.APPLICATION_JSON))
+				.param("page", "0")
+				.param("size", "10")
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isArray());
 	}
@@ -83,8 +82,8 @@ class TutorialControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/tutorials")
-						.param("id", tutorialId.toString())
-						.contentType(MediaType.APPLICATION_JSON))
+				.param("id", tutorialId.toString())
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content[0].id").value(tutorialId.toString()));
 	}
@@ -95,8 +94,8 @@ class TutorialControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/tutorials")
-						.param("title", "Test Tutorial")
-						.contentType(MediaType.APPLICATION_JSON))
+				.param("title", "Test Tutorial")
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content[0].title").value("Test Tutorial"));
 	}
@@ -107,8 +106,8 @@ class TutorialControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/tutorials")
-						.param("description", "Test Description")
-						.contentType(MediaType.APPLICATION_JSON))
+				.param("description", "Test Description")
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content[0].description").value("Test Description"));
 	}
@@ -119,8 +118,8 @@ class TutorialControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/tutorials")
-						.param("published", "true")
-						.contentType(MediaType.APPLICATION_JSON))
+				.param("published", "true")
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content[0].published").value(true));
 	}
@@ -132,7 +131,7 @@ class TutorialControllerTest {
 				.thenReturn(emptyResponse);
 
 		mockMvc.perform(get("/api/tutorials")
-						.contentType(MediaType.APPLICATION_JSON))
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isEmpty())
 				.andExpect(jsonPath("$.totalElements").value(0));
@@ -144,13 +143,13 @@ class TutorialControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/tutorials")
-						.param("page", "0")
-						.param("size", "10")
-						.param("id", tutorialId.toString())
-						.param("title", "Test Tutorial")
-						.param("description", "Test Description")
-						.param("published", "true")
-						.contentType(MediaType.APPLICATION_JSON))
+				.param("page", "0")
+				.param("size", "10")
+				.param("id", tutorialId.toString())
+				.param("title", "Test Tutorial")
+				.param("description", "Test Description")
+				.param("published", "true")
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content[0].title").value("Test Tutorial"));
 	}

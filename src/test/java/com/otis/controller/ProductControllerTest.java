@@ -1,13 +1,5 @@
 package com.otis.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -15,11 +7,18 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.otis.model.entity.PageResponse;
@@ -28,7 +27,6 @@ import com.otis.service.ProductService;
 
 @ExtendWith(MockitoExtension.class)
 class ProductControllerTest {
-
 	private MockMvc mockMvc;
 
 	@Mock
@@ -57,7 +55,7 @@ class ProductControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/products")
-						.contentType(MediaType.APPLICATION_JSON))
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isArray())
 				.andExpect(jsonPath("$.content[0].name").value("Test Product"))
@@ -71,9 +69,9 @@ class ProductControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/products")
-						.param("page", "0")
-						.param("size", "10")
-						.contentType(MediaType.APPLICATION_JSON))
+				.param("page", "0")
+				.param("size", "10")
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isArray());
 	}
@@ -84,8 +82,8 @@ class ProductControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/products")
-						.param("id", productId.toString())
-						.contentType(MediaType.APPLICATION_JSON))
+				.param("id", productId.toString())
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content[0].id").value(productId.toString()));
 	}
@@ -96,8 +94,8 @@ class ProductControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/products")
-						.param("name", "Test Product")
-						.contentType(MediaType.APPLICATION_JSON))
+				.param("name", "Test Product")
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content[0].name").value("Test Product"));
 	}
@@ -108,8 +106,8 @@ class ProductControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/products")
-						.param("company", companyId.toString())
-						.contentType(MediaType.APPLICATION_JSON))
+				.param("company", companyId.toString())
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk());
 	}
 
@@ -119,8 +117,8 @@ class ProductControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/products")
-						.param("companyName", "Test Company")
-						.contentType(MediaType.APPLICATION_JSON))
+				.param("companyName", "Test Company")
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk());
 	}
 
@@ -131,7 +129,7 @@ class ProductControllerTest {
 				.thenReturn(emptyResponse);
 
 		mockMvc.perform(get("/api/products")
-						.contentType(MediaType.APPLICATION_JSON))
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isEmpty())
 				.andExpect(jsonPath("$.totalElements").value(0));
@@ -143,13 +141,13 @@ class ProductControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/products")
-						.param("page", "0")
-						.param("size", "10")
-						.param("id", productId.toString())
-						.param("name", "Test Product")
-						.param("company", companyId.toString())
-						.param("companyName", "Test Company")
-						.contentType(MediaType.APPLICATION_JSON))
+				.param("page", "0")
+				.param("size", "10")
+				.param("id", productId.toString())
+				.param("name", "Test Product")
+				.param("company", companyId.toString())
+				.param("companyName", "Test Company")
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content[0].name").value("Test Product"));
 	}

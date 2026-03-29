@@ -1,13 +1,5 @@
 package com.otis.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -15,21 +7,26 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.otis.model.dto.SeatAvailability;
 import com.otis.model.entity.Event;
 import com.otis.model.entity.PageResponse;
 import com.otis.service.EventService;
 
 @ExtendWith(MockitoExtension.class)
 class EventControllerTest {
-
 	private MockMvc mockMvc;
 
 	@Mock
@@ -43,6 +40,7 @@ class EventControllerTest {
 	private PageResponse<Event> pageResponse;
 
 	@BeforeEach
+	@SuppressWarnings("unused")
 	void setUp() {
 		mockMvc = MockMvcBuilders.standaloneSetup(eventController).build();
 		eventId = UUID.randomUUID();
@@ -56,7 +54,7 @@ class EventControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/events")
-						.contentType(MediaType.APPLICATION_JSON))
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isArray())
 				.andExpect(jsonPath("$.content[0].name").value("Test Event"))
@@ -70,9 +68,9 @@ class EventControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/events")
-						.param("page", "0")
-						.param("size", "10")
-						.contentType(MediaType.APPLICATION_JSON))
+				.param("page", "0")
+				.param("size", "10")
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isArray());
 	}
@@ -83,8 +81,8 @@ class EventControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/events")
-						.param("id", eventId.toString())
-						.contentType(MediaType.APPLICATION_JSON))
+				.param("id", eventId.toString())
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content[0].id").value(eventId.toString()));
 	}
@@ -95,8 +93,8 @@ class EventControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/events")
-						.param("name", "Test Event")
-						.contentType(MediaType.APPLICATION_JSON))
+				.param("name", "Test Event")
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content[0].name").value("Test Event"));
 	}
@@ -107,8 +105,8 @@ class EventControllerTest {
 				.thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/events")
-						.param("venue", "Test Venue")
-						.contentType(MediaType.APPLICATION_JSON))
+				.param("venue", "Test Venue")
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content[0].venue").value("Test Venue"));
 	}
@@ -120,7 +118,7 @@ class EventControllerTest {
 				.thenReturn(emptyResponse);
 
 		mockMvc.perform(get("/api/events")
-						.contentType(MediaType.APPLICATION_JSON))
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isEmpty())
 				.andExpect(jsonPath("$.totalElements").value(0));
@@ -131,7 +129,7 @@ class EventControllerTest {
 		when(eventService.findById(eventId)).thenReturn(event);
 
 		mockMvc.perform(get("/api/events/{id}", eventId)
-						.contentType(MediaType.APPLICATION_JSON))
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.id").value(eventId.toString()))
 				.andExpect(jsonPath("$.name").value("Test Event"))
@@ -143,7 +141,7 @@ class EventControllerTest {
 		when(eventService.findById(any())).thenReturn(null);
 
 		mockMvc.perform(get("/api/events/{id}", UUID.randomUUID())
-						.contentType(MediaType.APPLICATION_JSON))
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound());
 	}
 
@@ -153,7 +151,7 @@ class EventControllerTest {
 		when(eventService.getTotalSeats(eventId)).thenReturn(100);
 
 		mockMvc.perform(get("/api/events/{id}/seats/available", eventId)
-						.contentType(MediaType.APPLICATION_JSON))
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.total").value(100))
 				.andExpect(jsonPath("$.available").value(50));

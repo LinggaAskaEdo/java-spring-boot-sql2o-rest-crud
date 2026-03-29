@@ -1,15 +1,5 @@
 package com.otis.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -17,10 +7,19 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.otis.model.entity.PageResponse;
@@ -30,7 +29,6 @@ import com.otis.service.SeatService;
 
 @ExtendWith(MockitoExtension.class)
 class SeatControllerTest {
-
 	private MockMvc mockMvc;
 
 	@Mock
@@ -47,6 +45,7 @@ class SeatControllerTest {
 	private PageResponse<Seat> pageResponse;
 
 	@BeforeEach
+	@SuppressWarnings("unused")
 	void setUp() {
 		mockMvc = MockMvcBuilders.standaloneSetup(seatController).build();
 		eventId = UUID.randomUUID();
@@ -62,7 +61,7 @@ class SeatControllerTest {
 		when(seatService.findByEventId(anyInt(), anyInt(), any())).thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/events/{eventId}/seats", eventId)
-						.contentType(APPLICATION_JSON))
+				.contentType(APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isArray())
 				.andExpect(jsonPath("$.content[0].seatNumber").value("A1"))
@@ -75,9 +74,9 @@ class SeatControllerTest {
 		when(seatService.findByEventId(anyInt(), anyInt(), any())).thenReturn(pageResponse);
 
 		mockMvc.perform(get("/api/events/{eventId}/seats", eventId)
-						.param("page", "0")
-						.param("size", "20")
-						.contentType(APPLICATION_JSON))
+				.param("page", "0")
+				.param("size", "20")
+				.contentType(APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isArray());
 	}
@@ -88,7 +87,7 @@ class SeatControllerTest {
 		when(seatService.findByEventId(anyInt(), anyInt(), any())).thenReturn(emptyResponse);
 
 		mockMvc.perform(get("/api/events/{eventId}/seats", eventId)
-						.contentType(APPLICATION_JSON))
+				.contentType(APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isEmpty())
 				.andExpect(jsonPath("$.totalElements").value(0));
@@ -99,8 +98,8 @@ class SeatControllerTest {
 		when(seatService.reserveSeats(any(), anyString(), anyInt())).thenReturn(reservation);
 
 		mockMvc.perform(post("/api/events/{eventId}/reserve", eventId)
-						.contentType(APPLICATION_JSON)
-						.content("{\"customerName\": \"John Doe\", \"seatCount\": 3}"))
+				.contentType(APPLICATION_JSON)
+				.content("{\"customerName\": \"John Doe\", \"seatCount\": 3}"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.id").value(reservationId.toString()))
 				.andExpect(jsonPath("$.customerName").value("John Doe"))
@@ -112,8 +111,8 @@ class SeatControllerTest {
 		when(seatService.reserveSeats(any(), anyString(), anyInt())).thenReturn(null);
 
 		mockMvc.perform(post("/api/events/{eventId}/reserve", eventId)
-						.contentType(APPLICATION_JSON)
-						.content("{\"customerName\": \"John Doe\", \"seatCount\": 100}"))
+				.contentType(APPLICATION_JSON)
+				.content("{\"customerName\": \"John Doe\", \"seatCount\": 100}"))
 				.andExpect(status().isBadRequest());
 	}
 
@@ -122,7 +121,7 @@ class SeatControllerTest {
 		when(seatService.cancelReservation(reservationId)).thenReturn(true);
 
 		mockMvc.perform(post("/api/reservations/{reservationId}/cancel", reservationId)
-						.contentType(APPLICATION_JSON))
+				.contentType(APPLICATION_JSON))
 				.andExpect(status().isNoContent());
 	}
 
@@ -131,7 +130,7 @@ class SeatControllerTest {
 		when(seatService.cancelReservation(any())).thenReturn(false);
 
 		mockMvc.perform(post("/api/reservations/{reservationId}/cancel", UUID.randomUUID())
-						.contentType(APPLICATION_JSON))
+				.contentType(APPLICATION_JSON))
 				.andExpect(status().isNotFound());
 	}
 }
