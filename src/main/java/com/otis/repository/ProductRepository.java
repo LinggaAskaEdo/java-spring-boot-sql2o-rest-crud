@@ -30,7 +30,6 @@ public class ProductRepository {
 
 	public PageResponse<Product> findByFilters(int page, int size, UUID id, String name, UUID companyId,
 			String companyName) {
-		// 1. Build base filter parameters (only non‑null / non‑blank values)
 		Map<String, Object> filterParams = new HashMap<>();
 
 		if (id != null) {
@@ -49,41 +48,35 @@ public class ProductRepository {
 			filterParams.put(ConstantPreference.COMPANY_NAME, "%" + companyName + "%");
 		}
 
-		// 2. Build pagination parameters (for the main query)
 		int offset = page * size;
 		Map<String, Object> pagingParams = new HashMap<>(filterParams);
 		pagingParams.put(ConstantPreference.SIZE, size);
 		pagingParams.put(ConstantPreference.OFFSET, offset);
 
-		// 3. Get the dynamic SQL (ElSql will expand @AND and @PAGING)
 		String findSql = bundle.getSql("FindByFilters", pagingParams);
-		String countSql = bundle.getSql("CountByFilters", filterParams); // count uses only filters
+		String countSql = bundle.getSql("CountByFilters", filterParams);
 
-		log.info("FindByFilters: {}", findSql);
-		log.info("CountByFilters: {}", countSql);
+		log.debug("FindByFilters: {}", findSql);
+		log.debug("CountByFilters: {}", countSql);
 
 		try (Connection conn = sql2o.open()) {
-			// Main query
-			Query query = conn.createQuery(findSql);
-			for (Map.Entry<String, Object> entry : pagingParams.entrySet()) {
-				query.addParameter(entry.getKey(), entry.getValue());
+			try (Query query = conn.createQuery(findSql);
+					Query countQuery = conn.createQuery(countSql)) {
+
+				for (Map.Entry<String, Object> entry : pagingParams.entrySet()) {
+					query.addParameter(entry.getKey(), entry.getValue());
+					countQuery.addParameter(entry.getKey(), entry.getValue());
+				}
+
+				var products = query.executeAndFetch(Product.class);
+				long totalElements = countQuery.executeAndFetchFirst(Integer.class);
+
+				int totalPages = (int) Math.ceil((double) totalElements / size);
+				boolean isFirst = page == 0;
+				boolean isLast = page >= totalPages - 1;
+
+				return new PageResponse<>(products, page, size, totalElements, totalPages, isFirst, isLast);
 			}
-
-			var products = query.executeAndFetch(Product.class);
-
-			// Count query
-			Query countQuery = conn.createQuery(countSql);
-			for (Map.Entry<String, Object> entry : filterParams.entrySet()) {
-				countQuery.addParameter(entry.getKey(), entry.getValue());
-			}
-
-			long totalElements = countQuery.executeAndFetchFirst(Integer.class);
-
-			int totalPages = (int) Math.ceil((double) totalElements / size);
-			boolean isFirst = page == 0;
-			boolean isLast = page >= totalPages - 1;
-
-			return new PageResponse<>(products, page, size, totalElements, totalPages, isFirst, isLast);
 		}
 	}
 }

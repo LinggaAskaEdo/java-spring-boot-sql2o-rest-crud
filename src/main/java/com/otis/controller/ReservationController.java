@@ -3,6 +3,8 @@ package com.otis.controller;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,11 +16,14 @@ import com.otis.model.dto.ReservationRequest;
 import com.otis.model.entity.Reservation;
 import com.otis.service.ReservationService;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@CrossOrigin(origins = "${api.cors.allowed-origins:*}")
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
+@Validated
 public class ReservationController {
 	private final ReservationService reservationService;
 
@@ -27,7 +32,7 @@ public class ReservationController {
 	}
 
 	@PostMapping("/reservations")
-	public ResponseEntity<Reservation> createReservation(@RequestBody ReservationRequest request) {
+	public ResponseEntity<Reservation> createReservation(@Valid @RequestBody ReservationRequest request) {
 		Reservation reservation = reservationService.create(request);
 		return ResponseEntity.ok(reservation);
 	}

@@ -30,7 +30,6 @@ public class EventRepository {
 	}
 
 	public PageResponse<Event> findByFilters(int page, int size, UUID id, String name, String venue) {
-		// Build filter parameters
 		Map<String, Object> filterParams = new HashMap<>();
 		if (id != null) {
 			filterParams.put(ConstantPreference.ID, id.toString());
@@ -44,29 +43,25 @@ public class EventRepository {
 			filterParams.put(ConstantPreference.VENUE, "%" + venue + "%");
 		}
 
-		// Build pagination parameters
 		int offset = page * size;
 		Map<String, Object> pagingParams = new HashMap<>(filterParams);
 		pagingParams.put(ConstantPreference.SIZE, size);
 		pagingParams.put(ConstantPreference.OFFSET, offset);
 
-		// Get dynamic SQL
 		String findSql = bundle.getSql("FindByFilters", pagingParams);
 		String countSql = bundle.getSql("CountByFilters", filterParams);
 
-		log.info("FindByFilters: {}", findSql);
-		log.info("CountByFilters: {}", countSql);
+		log.debug("FindByFilters: {}", findSql);
+		log.debug("CountByFilters: {}", countSql);
 
 		try (Connection conn = sql2o.open();
 				Query query = conn.createQuery(findSql);
 				Query countQuery = conn.createQuery(countSql)) {
 
-			// Bind parameters to main query
 			for (Map.Entry<String, Object> entry : pagingParams.entrySet()) {
 				query.addParameter(entry.getKey(), entry.getValue());
 			}
 
-			// Bind filter parameters to count query
 			for (Map.Entry<String, Object> entry : filterParams.entrySet()) {
 				countQuery.addParameter(entry.getKey(), entry.getValue());
 			}
@@ -84,17 +79,18 @@ public class EventRepository {
 
 	public int countAvailableSeats(UUID eventId) {
 		String sql = bundle.getSql("CountAvailableSeats");
-		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {
+		try (Connection conn = sql2o.open();
+				Query query = conn.createQuery(sql)) {
 			Integer count = query.addParameter(ConstantPreference.EVENT_ID, eventId.toString())
 					.executeAndFetchFirst(Integer.class);
-
 			return count != null ? count : 0;
 		}
 	}
 
 	public int countTotalSeats(UUID eventId) {
 		String sql = bundle.getSql("CountTotalSeats");
-		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {
+		try (Connection conn = sql2o.open();
+				Query query = conn.createQuery(sql)) {
 			Integer count = query.addParameter(ConstantPreference.EVENT_ID, eventId.toString())
 					.executeAndFetchFirst(Integer.class);
 			return count != null ? count : 0;
@@ -103,7 +99,8 @@ public class EventRepository {
 
 	public int countEvents() {
 		String sql = bundle.getSql("CountEvents");
-		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {
+		try (Connection conn = sql2o.open();
+				Query query = conn.createQuery(sql)) {
 			Integer count = query.executeAndFetchFirst(Integer.class);
 			return count != null ? count : 0;
 		}
@@ -111,7 +108,8 @@ public class EventRepository {
 
 	public void insertEvent(UUID id, String name, String venue) {
 		String sql = bundle.getSql("InsertEvent");
-		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {
+		try (Connection conn = sql2o.open();
+				Query query = conn.createQuery(sql)) {
 			query.addParameter(ConstantPreference.ID, id.toString())
 					.addParameter(ConstantPreference.NAME, name)
 					.addParameter(ConstantPreference.VENUE, venue)
@@ -121,9 +119,9 @@ public class EventRepository {
 
 	public UUID findFirstEventId() {
 		String sql = bundle.getSql("FindFirstEvent");
-		try (Connection conn = sql2o.open(); Query query = conn.createQuery(sql)) {
+		try (Connection conn = sql2o.open();
+				Query query = conn.createQuery(sql)) {
 			String idStr = query.executeAndFetchFirst(String.class);
-
 			return idStr != null ? UuidUtils.parseUUID(idStr) : null;
 		}
 	}

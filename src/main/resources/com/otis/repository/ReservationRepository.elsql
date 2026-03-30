@@ -1,6 +1,25 @@
 @NAME(Create)
-    INSERT INTO reservations (id, event_id, customer_name, seat_count)
-    VALUES (:id, :eventId, :customerName, :seatCount)
+    INSERT INTO reservations (id, event_id, customer_name, seat_count, status, expires_at)
+    VALUES (:id, :eventId, :customerName, :seatCount, :status, :expiresAt)
 
 @NAME(FindById)
-    SELECT id, event_id AS eventId, customer_name AS customerName, seat_count AS seatCount FROM reservations WHERE id = :id
+    SELECT id, event_id AS eventId, customer_name AS customerName, 
+           seat_count AS seatCount, status AS status, expires_at AS expiresAt
+    FROM reservations
+    WHERE id = :id
+
+@NAME(UpdateStatus)
+    UPDATE reservations
+    SET status = :status
+    WHERE id = :id
+
+@NAME(DeleteById)
+    DELETE FROM reservations
+    WHERE id = :id
+
+@NAME(CountPendingByCustomer)
+    SELECT COALESCE(SUM(seat_count), 0)
+    FROM reservations
+    WHERE event_id = :eventId 
+      AND customer_name = :customerName
+      AND status IN ('pending', 'reserved')

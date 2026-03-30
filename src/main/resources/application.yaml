@@ -1,5 +1,10 @@
 server:
   port: 6661
+  servlet:
+    context-path: /
+  max-http-request-header-size: 16KB
+  jetty:
+    max-http-form-post-size: 1MB
 
 spring:
   application:
@@ -15,8 +20,8 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       pool-name: HikariPool-1
-      maximum-pool-size: 151 # SHOW VARIABLES LIKE 'max_connections';
-      minimum-idle: 5
+      maximum-pool-size: ${HIKARI_MAX_POOL_SIZE:30}
+      minimum-idle: ${HIKARI_MIN_IDLE:5}
       idle-timeout: 300000
       max-lifetime: 1800000
       connection-timeout: 30000
@@ -44,6 +49,9 @@ redisson:
 
 logging:
   config: classpath:logback-spring.xml
+  level:
+    "[com.otis]": ${LOG_LEVEL:INFO}
+    "[com.otis.repository]": ${LOG_LEVEL_REPOSITORY:DEBUG}
 
 rate-limiter:
   tiers:
@@ -71,6 +79,14 @@ resilience4j:
       database:
         max-concurrent-calls: ${BULKHEAD_MAX_CONCURRENT_CALLS:29}
         max-wait-duration: ${BULKHEAD_MAX_WAIT_DURATION:500ms}
+  retry:
+    instances:
+      database:
+        max-attempts: ${RETRY_MAX_ATTEMPTS:3}
+        wait-duration: ${RETRY_WAIT_DURATION:100ms}
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: ${RETRY_BACKOFF_MULTIPLIER:2}
+        retry-exceptions: java.sql.SQLException,java.sql.SQLTransientConnectionException,java.sql.SQLTimeoutException
 
 scheduler:
   data-seeder:
@@ -82,3 +98,11 @@ scheduler:
     max-companies-per-product: ${DATA_SEEDER_MAX_COMPANIES_PER_PRODUCT:3}
   seat-seeder:
     enabled: ${SEAT_SEEDER_ENABLED:true}
+
+api:
+  version: v1
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:*}
+  pagination:
+    max-page-size: ${MAX_PAGE_SIZE:100}
+    default-page-size: ${DEFAULT_PAGE_SIZE:10}

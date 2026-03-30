@@ -1,6 +1,7 @@
 @NAME(FindByEventId)
     SELECT id, event_id AS eventId, seat_number AS seatNumber,
-           reserved AS reserved, reservation_id AS reservationId
+           status AS status, held_by AS heldBy, held_until AS heldUntil,
+           version AS version, reserved AS reserved, reservation_id AS reservationId
     FROM seats
     WHERE event_id = :eventId
     ORDER BY seat_number
@@ -13,35 +14,92 @@
 
 @NAME(FindAvailableSeats)
     SELECT id, event_id AS eventId, seat_number AS seatNumber,
-           reserved AS reserved, reservation_id AS reservationId
+           status AS status, held_by AS heldBy, held_until AS heldUntil,
+           version AS version, reserved AS reserved, reservation_id AS reservationId
     FROM seats
-    WHERE event_id = :eventId AND reserved = FALSE
+    WHERE event_id = :eventId AND status = 'available'
 
 @NAME(FindAndLockAvailableSeats)
     SELECT id, event_id AS eventId, seat_number AS seatNumber,
-           reserved AS reserved, reservation_id AS reservationId
+           status AS status, held_by AS heldBy, held_until AS heldUntil,
+           version AS version, reserved AS reserved, reservation_id AS reservationId
     FROM seats
-    WHERE event_id = :eventId AND reserved = FALSE
-    ORDER BY seat_number
+    WHERE event_id = :eventId AND status = 'available'
+    ORDER BY id ASC
     LIMIT :limit
-    FOR UPDATE SKIP LOCKED
+    FOR NO KEY UPDATE SKIP LOCKED
 
-@NAME(LockSeatById)
-    SELECT id
+@NAME(LockSeatsByIds)
+    SELECT id, event_id AS eventId, seat_number AS seatNumber,
+           status AS status, held_by AS heldBy, held_until AS heldUntil,
+           version AS version, reserved AS reserved, reservation_id AS reservationId
     FROM seats
-    WHERE id = :id AND reserved = FALSE
-    FOR UPDATE
+    WHERE id IN (:ids)
+    ORDER BY id ASC
+    FOR NO KEY UPDATE
 
-@NAME(ReserveSeatById)
+@NAME(ReserveSeatsByIds)
     UPDATE seats
-    SET reserved = TRUE, reservation_id = :reservationId
-    WHERE id = :id
+    SET status = 'reserved', 
+        reservation_id = :reservationId,
+        held_until = DATE_ADD(NOW(), INTERVAL 10 MINUTE),
+        version = version + 1
+    WHERE id IN (:ids) AND status = 'available'
+
+@NAME(ReserveSeatsWithVersion)
+    UPDATE seats
+    SET status = 'reserved',
+        held_by = :reservationId,
+        held_until = :heldUntil,
+        reservation_id = :reservationId,
+        version = version + 1
+    WHERE id IN (:ids) AND status = 'available' AND version = (
+        SELECT version FROM (
+            SELECT version FROM seats WHERE id = :ids
+        ) AS subquery
+    )
 
 @NAME(ReleaseSeats)
     UPDATE seats
-    SET reserved = FALSE, reservation_id = NULL
+    SET status = 'available', 
+        reservation_id = NULL,
+        held_by = NULL,
+        held_until = NULL,
+        version = version + 1
     WHERE reservation_id = :reservationId
 
+@NAME(ReleaseSeatsByIds)
+    UPDATE seats
+    SET status = 'available',
+        reservation_id = NULL,
+        held_by = NULL,
+        held_until = NULL,
+        version = version + 1
+    WHERE id IN (:ids)
+
+@NAME(ConfirmSeats)
+    UPDATE seats
+    SET status = 'booked',
+        reservation_id = :reservationId,
+        held_by = NULL,
+        held_until = NULL,
+        version = version + 1
+    WHERE id IN (:ids) AND reservation_id = :reservationId
+
+@NAME(ReleaseExpiredReservations)
+    UPDATE seats
+    SET status = 'available',
+        reservation_id = NULL,
+        held_by = NULL,
+        held_until = NULL,
+        version = version + 1
+    WHERE status = 'reserved' AND held_until < NOW()
+
 @NAME(InsertSeat)
-    INSERT INTO seats (id, event_id, seat_number, reserved)
-    VALUES (:id, :eventId, :seatNumber, 0)
+    INSERT INTO seats (id, event_id, seat_number, status, version)
+    VALUES (:id, :eventId, :seatNumber, 'available', 0)
+
+@NAME(CountAvailableSeats)
+    SELECT COUNT(*)
+    FROM seats
+    WHERE event_id = :eventId AND status = 'available'

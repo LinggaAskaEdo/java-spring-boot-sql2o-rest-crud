@@ -1,0 +1,12 @@
+@NAME(Create)
+    INSERT INTO reservation_seats (id, reservation_id, seat_id)
+    VALUES (:id, :reservationId, :seatId)
+
+@NAME(FindByReservationId)
+    SELECT id, reservation_id AS reservationId, seat_id AS seatId, created_at AS createdAt
+    FROM reservation_seats
+    WHERE reservation_id = :reservationId
+
+@NAME(DeleteByReservationId)
+    DELETE FROM reservation_seats
+    WHERE reservation_id = :reservationId

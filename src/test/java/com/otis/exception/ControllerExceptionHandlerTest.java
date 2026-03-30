@@ -119,7 +119,7 @@ class ControllerExceptionHandlerTest {
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isTooManyRequests())
 				.andExpect(jsonPath("$.statusCode").value(429))
-				.andExpect(jsonPath("$.message").value("Rate limit exceeded message"))
+				.andExpect(jsonPath("$.message").value("Rate limit exceeded. Please try again later."))
 				.andExpect(jsonPath("$.description").exists());
 	}
 
@@ -129,7 +129,7 @@ class ControllerExceptionHandlerTest {
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isInternalServerError())
 				.andExpect(jsonPath("$.statusCode").value(500))
-				.andExpect(jsonPath("$.message").value("Internal server error message"))
+				.andExpect(jsonPath("$.message").value("An unexpected error occurred. Please try again later."))
 				.andExpect(jsonPath("$.description").exists());
 	}
 
@@ -180,7 +180,7 @@ class ControllerExceptionHandlerTest {
 
 		assertNotNull(result);
 		assertEquals(429, result.getStatusCode());
-		assertEquals("Rate exceeded", result.getMessage());
+		assertEquals("Rate limit exceeded. Please try again later.", result.getMessage());
 	}
 
 	@Test
@@ -190,6 +190,6 @@ class ControllerExceptionHandlerTest {
 
 		assertNotNull(result);
 		assertEquals(500, result.getStatusCode());
-		assertEquals("Server error", result.getMessage());
+		assertEquals("An unexpected error occurred. Please try again later.", result.getMessage());
 	}
 }

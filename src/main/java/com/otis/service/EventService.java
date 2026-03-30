@@ -7,34 +7,35 @@ import org.springframework.stereotype.Service;
 import com.otis.model.entity.Event;
 import com.otis.model.entity.PageResponse;
 import com.otis.repository.EventRepository;
-import com.otis.util.BulkheadUtils;
 
-import io.github.resilience4j.bulkhead.Bulkhead;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 public class EventService {
 	private final EventRepository eventRepository;
-	private final Bulkhead bulkhead;
 
-	public EventService(EventRepository eventRepository, Bulkhead databaseBulkhead) {
+	public EventService(EventRepository eventRepository) {
 		this.eventRepository = eventRepository;
-		this.bulkhead = databaseBulkhead;
 	}
 
+	@Bulkhead(name = "database")
+	@Retry(name = "database")
 	public PageResponse<Event> findByFilters(int page, int size, UUID id, String name, String venue) {
-		return BulkheadUtils.withBulkhead(bulkhead,
-				() -> eventRepository.findByFilters(page, size, id, name, venue), "findByFilters");
+		return eventRepository.findByFilters(page, size, id, name, venue);
 	}
 
+	@Bulkhead(name = "database")
+	@Retry(name = "database")
 	public int getAvailableSeats(UUID eventId) {
-		return BulkheadUtils.withBulkhead(bulkhead,
-				() -> eventRepository.countAvailableSeats(eventId), "countAvailableSeats");
+		return eventRepository.countAvailableSeats(eventId);
 	}
 
+	@Bulkhead(name = "database")
+	@Retry(name = "database")
 	public int getTotalSeats(UUID eventId) {
-		return BulkheadUtils.withBulkhead(bulkhead,
-				() -> eventRepository.countTotalSeats(eventId), "countTotalSeats");
+		return eventRepository.countTotalSeats(eventId);
 	}
 }

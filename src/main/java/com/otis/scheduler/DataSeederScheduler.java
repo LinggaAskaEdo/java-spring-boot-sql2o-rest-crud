@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.sql2o.Connection;
@@ -24,24 +25,22 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+@ConditionalOnProperty(name = "scheduler.data-seeder.enabled", havingValue = "true")
 public class DataSeederScheduler {
 	private final Sql2o sql2o;
 	private final ElSql bundle;
-	private final boolean enabled;
 	private final int totalCompanies;
 	private final int totalProducts;
 	private final int totalTutorials;
 	private final int maxCompaniesPerProduct;
 
 	public DataSeederScheduler(Sql2o sql2o,
-			@Value("${scheduler.data-seeder.enabled:false}") boolean enabled,
 			@Value("${scheduler.data-seeder.total-companies:10}") int totalCompanies,
 			@Value("${scheduler.data-seeder.total-products:15}") int totalProducts,
 			@Value("${scheduler.data-seeder.total-tutorials:10}") int totalTutorials,
 			@Value("${scheduler.data-seeder.max-companies-per-product:3}") int maxCompaniesPerProduct) {
 		this.sql2o = sql2o;
 		this.bundle = ElSql.of(ElSqlConfig.MYSQL, DataSeederScheduler.class);
-		this.enabled = enabled;
 		this.totalCompanies = totalCompanies;
 		this.totalProducts = totalProducts;
 		this.totalTutorials = totalTutorials;
@@ -50,11 +49,6 @@ public class DataSeederScheduler {
 
 	@Scheduled(cron = "${scheduler.data-seeder.cron:0 0 0 * * ?}")
 	public void seedData() {
-		if (!enabled) {
-			log.debug("Data seeder is disabled");
-			return;
-		}
-
 		log.info("Starting data seeding with {} companies, {} products, {} tutorials...",
 				totalCompanies, totalProducts, totalTutorials);
 		seedCompanies();
@@ -98,7 +92,13 @@ public class DataSeederScheduler {
 
 		try (Connection connection = sql2o.open()) {
 			for (int i = 0; i < totalProducts; i++) {
-				UUID randomCompanyId = companyIds.get(RandomUtils.randomInt(companyIds.size()));
+				// Use SQL to get random company instead of loading all into memory
+				UUID randomCompanyId = getRandomCompanyId();
+				if (randomCompanyId == null) {
+					log.warn("Could not fetch random company, skipping product");
+					continue;
+				}
+				
 				String sql = bundle.getSql("InsertProduct");
 				try (Query query = connection.createQuery(sql)) {
 					query.addParameter(ConstantPreference.ID, UuidUtils.randomUuidV7().toString())
@@ -139,11 +139,11 @@ public class DataSeederScheduler {
 						if (!insertedRelations.contains(relationKey)) {
 							insertedRelations.add(relationKey);
 							String sql = bundle.getSql("InsertProductsCompany");
-						try (Query query = connection.createQuery(sql)) {
-							query.addParameter("productId", productId.toString())
-									.addParameter(ConstantPreference.COMPANYID, randomCompanyId.toString())
-									.executeUpdate();
-						}
+							try (Query query = connection.createQuery(sql)) {
+								query.addParameter("productId", productId.toString())
+										.addParameter(ConstantPreference.COMPANYID, randomCompanyId.toString())
+										.executeUpdate();
+							}
 						}
 					}
 				}
@@ -210,5 +210,21 @@ public class DataSeederScheduler {
 		}
 
 		return ids;
+	}
+
+	/**
+	 * Get a random company ID using SQL ORDER BY RAND() LIMIT 1
+	 * More efficient than loading all IDs into memory
+	 */
+	private UUID getRandomCompanyId() {
+		String sql = "SELECT id FROM company ORDER BY RAND() LIMIT 1";
+		try (Connection connection = sql2o.open();
+				Query query = connection.createQuery(sql)) {
+			List<Map<String, Object>> result = query.executeAndFetchTable().asList();
+			if (result.isEmpty()) {
+				return null;
+			}
+			return UUID.fromString(result.get(0).get("id").toString());
+		}
 	}
 }

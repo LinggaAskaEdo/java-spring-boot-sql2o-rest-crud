@@ -7,24 +7,23 @@ import org.springframework.stereotype.Service;
 import com.otis.model.entity.Company;
 import com.otis.model.entity.PageResponse;
 import com.otis.repository.CompanyRepository;
-import com.otis.util.BulkheadUtils;
 
-import io.github.resilience4j.bulkhead.Bulkhead;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 public class CompanyService {
 	private final CompanyRepository repository;
-	private final Bulkhead bulkhead;
 
-	public CompanyService(CompanyRepository repository, Bulkhead databaseBulkhead) {
+	public CompanyService(CompanyRepository repository) {
 		this.repository = repository;
-		this.bulkhead = databaseBulkhead;
 	}
 
+	@Bulkhead(name = "database")
+	@Retry(name = "database")
 	public PageResponse<Company> findByFilters(int page, int size, UUID id, String name) {
-		return BulkheadUtils.withBulkhead(bulkhead,
-				() -> repository.findByFilters(page, size, id, name), "findByFilters");
+		return repository.findByFilters(page, size, id, name);
 	}
 }

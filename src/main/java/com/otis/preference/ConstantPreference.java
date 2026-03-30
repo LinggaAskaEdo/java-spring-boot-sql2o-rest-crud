@@ -9,6 +9,7 @@ public class ConstantPreference {
 	public static final String WHERE = " WHERE ";
 
 	public static final String ID = "id";
+	public static final String IDS = "ids";
 	public static final String EVENT_ID = "eventId";
 	public static final String COMPANY_ID = "company_id";
 	public static final String COMPANYID = "companyID";
@@ -25,5 +26,11 @@ public class ConstantPreference {
 	public static final String CUSTOMER_NAME = "customerName";
 	public static final String SEAT_COUNT = "seatCount";
 	public static final String SEAT_NUMBER = "seatNumber";
+	public static final String SEAT_ID = "seatId";
 	public static final String RESERVATION_ID = "reservationId";
+	public static final String STATUS = "status";
+	public static final String HELD_BY = "heldBy";
+	public static final String HELD_UNTIL = "heldUntil";
+	public static final String VERSION = "version";
+	public static final String EXPIRES_AT = "expiresAt";
 }

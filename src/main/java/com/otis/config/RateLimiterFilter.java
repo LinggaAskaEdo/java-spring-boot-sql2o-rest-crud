@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class RateLimiterFilter extends OncePerRequestFilter {
 	private static final String API_KEY_HEADER = "x-api-key";
+	private static final String RATE_LIMIT_HEADER = "X-RateLimit-Remaining";
 
 	private final RedissonClient redissonClient;
 	private final RateLimiterProperties rateLimiterProperties;
@@ -54,16 +55,35 @@ public class RateLimiterFilter extends OncePerRequestFilter {
 		String rateLimiterKey = "rate_limiter:tier:" + tier;
 		RRateLimiter rateLimiter = redissonClient.getRateLimiter(rateLimiterKey);
 
+		// Ensure rate limiter exists (should be initialized at startup)
+		if (!rateLimiter.isExists()) {
+			log.warn("Rate limiter for tier '{}' does not exist, attempting to initialize", tier);
+			initializeRateLimiter(rateLimiter, tier);
+		}
+
 		log.debug("Rate limiter key: {}, isExists: {}", rateLimiterKey, rateLimiter.isExists());
 
 		if (!rateLimiter.tryAcquire()) {
-			log.warn("Rate limit exceeded for API key: {}", apiKey);
+			log.warn("Rate limit exceeded for API key: {} (tier: {})", apiKey, tier);
+			response.setHeader(RATE_LIMIT_HEADER, "0");
 			sendErrorResponse(response, HttpStatus.TOO_MANY_REQUESTS,
 					"Rate limit exceeded for tier: " + tier, request.getRequestURI());
 			return;
 		}
 
+		// Estimate remaining requests (approximate)
+		long remaining = rateLimiter.availablePermits();
+		response.setHeader(RATE_LIMIT_HEADER, String.valueOf(remaining));
+
 		filterChain.doFilter(request, response);
+	}
+
+	private void initializeRateLimiter(RRateLimiter rateLimiter, String tier) {
+		Integer maxRequests = rateLimiterProperties.getTiers().get(tier).getMaxRequests();
+		if (maxRequests != null) {
+			rateLimiter.setRate(org.redisson.api.RateType.OVERALL, maxRequests, java.time.Duration.ofSeconds(1));
+			log.info("Initialized rate limiter for tier '{}' with {} requests/second", tier, maxRequests);
+		}
 	}
 
 	private void sendErrorResponse(HttpServletResponse response, HttpStatus status, String message, String uri)

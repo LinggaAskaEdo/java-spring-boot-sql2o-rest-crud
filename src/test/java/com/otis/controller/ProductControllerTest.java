@@ -10,7 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -32,7 +31,6 @@ class ProductControllerTest {
 	@Mock
 	private ProductService productService;
 
-	@InjectMocks
 	private ProductController productController;
 
 	private UUID companyId;
@@ -43,6 +41,8 @@ class ProductControllerTest {
 	@BeforeEach
 	@SuppressWarnings("unused")
 	void setUp() {
+		// Initialize controller with pagination config values
+		productController = new ProductController(productService, 100, 10);
 		mockMvc = MockMvcBuilders.standaloneSetup(productController).build();
 		companyId = UUID.randomUUID();
 		productId = UUID.randomUUID();
@@ -55,7 +55,7 @@ class ProductControllerTest {
 		when(productService.findByFilters(anyInt(), anyInt(), any(), any(), any(), any()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/products")
+		mockMvc.perform(get("/api/v1/products")
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isArray())
@@ -69,7 +69,7 @@ class ProductControllerTest {
 		when(productService.findByFilters(anyInt(), anyInt(), any(), any(), any(), any()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/products")
+		mockMvc.perform(get("/api/v1/products")
 				.param("page", "0")
 				.param("size", "10")
 				.contentType(MediaType.APPLICATION_JSON))
@@ -82,7 +82,7 @@ class ProductControllerTest {
 		when(productService.findByFilters(anyInt(), anyInt(), any(), any(), any(), any()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/products")
+		mockMvc.perform(get("/api/v1/products")
 				.param("id", productId.toString())
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
@@ -94,7 +94,7 @@ class ProductControllerTest {
 		when(productService.findByFilters(anyInt(), anyInt(), any(), anyString(), any(), any()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/products")
+		mockMvc.perform(get("/api/v1/products")
 				.param("name", "Test Product")
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
@@ -106,7 +106,7 @@ class ProductControllerTest {
 		when(productService.findByFilters(anyInt(), anyInt(), any(), any(), any(), any()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/products")
+		mockMvc.perform(get("/api/v1/products")
 				.param("company", companyId.toString())
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk());
@@ -117,7 +117,7 @@ class ProductControllerTest {
 		when(productService.findByFilters(anyInt(), anyInt(), any(), any(), any(), anyString()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/products")
+		mockMvc.perform(get("/api/v1/products")
 				.param("companyName", "Test Company")
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk());
@@ -129,7 +129,7 @@ class ProductControllerTest {
 		when(productService.findByFilters(anyInt(), anyInt(), any(), any(), any(), any()))
 				.thenReturn(emptyResponse);
 
-		mockMvc.perform(get("/api/products")
+		mockMvc.perform(get("/api/v1/products")
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isEmpty())
@@ -141,7 +141,7 @@ class ProductControllerTest {
 		when(productService.findByFilters(anyInt(), anyInt(), any(), anyString(), any(), anyString()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/products")
+		mockMvc.perform(get("/api/v1/products")
 				.param("page", "0")
 				.param("size", "10")
 				.param("id", productId.toString())

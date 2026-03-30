@@ -42,8 +42,9 @@ public class RateLimiterKeyInitializer implements ApplicationRunner {
 			log.info("Checking rate limiter for tier '{}', key: {}, exists: {}", tierName, key, rateLimiter.isExists());
 
 			if (!rateLimiter.isExists()) {
-				rateLimiter.setRate(RateType.OVERALL, tierConfig.getMaxRequests(), Duration.ofMinutes(1));
-				log.info("Initialized Redis rate limiter for tier '{}' with max requests: {} per second", tierName,
+				// Set rate limit: maxRequests per SECOND (not minute)
+				rateLimiter.setRate(RateType.OVERALL, tierConfig.getMaxRequests(), Duration.ofSeconds(1));
+				log.info("Initialized Redis rate limiter for tier '{}' with {} requests per second", tierName,
 						tierConfig.getMaxRequests());
 			} else {
 				log.info("Redis rate limiter for tier '{}' already exists", tierName);

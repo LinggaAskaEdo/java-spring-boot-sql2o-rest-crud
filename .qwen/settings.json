@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn *)",
+      "Bash(make *)",
+      "Bash(mysql *)",
+      "Bash(timeout *)",
+      "Bash(sed *)",
+      "Bash(rm *)",
+      "Bash(git add *)"
+    ]
+  },
+  "$version": 3
+}

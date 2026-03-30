@@ -10,7 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -32,7 +31,6 @@ class EventControllerTest {
 	@Mock
 	private EventService eventService;
 
-	@InjectMocks
 	private EventController eventController;
 
 	private UUID eventId;
@@ -42,6 +40,7 @@ class EventControllerTest {
 	@BeforeEach
 	@SuppressWarnings("unused")
 	void setUp() {
+		eventController = new EventController(eventService, 100, 10);
 		mockMvc = MockMvcBuilders.standaloneSetup(eventController).build();
 		eventId = UUID.randomUUID();
 		event = new Event(eventId, "Test Event", "Test Venue");
@@ -53,7 +52,7 @@ class EventControllerTest {
 		when(eventService.findByFilters(anyInt(), anyInt(), any(), any(), any()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/events")
+		mockMvc.perform(get("/api/v1/events")
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isArray())
@@ -67,7 +66,7 @@ class EventControllerTest {
 		when(eventService.findByFilters(anyInt(), anyInt(), any(), any(), any()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/events")
+		mockMvc.perform(get("/api/v1/events")
 				.param("page", "0")
 				.param("size", "10")
 				.contentType(MediaType.APPLICATION_JSON))
@@ -80,7 +79,7 @@ class EventControllerTest {
 		when(eventService.findByFilters(anyInt(), anyInt(), any(), any(), any()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/events")
+		mockMvc.perform(get("/api/v1/events")
 				.param("id", eventId.toString())
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
@@ -92,7 +91,7 @@ class EventControllerTest {
 		when(eventService.findByFilters(anyInt(), anyInt(), any(), anyString(), any()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/events")
+		mockMvc.perform(get("/api/v1/events")
 				.param("name", "Test Event")
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
@@ -104,7 +103,7 @@ class EventControllerTest {
 		when(eventService.findByFilters(anyInt(), anyInt(), any(), any(), anyString()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/events")
+		mockMvc.perform(get("/api/v1/events")
 				.param("venue", "Test Venue")
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
@@ -117,7 +116,7 @@ class EventControllerTest {
 		when(eventService.findByFilters(anyInt(), anyInt(), any(), any(), any()))
 				.thenReturn(emptyResponse);
 
-		mockMvc.perform(get("/api/events")
+		mockMvc.perform(get("/api/v1/events")
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isEmpty())
@@ -129,7 +128,7 @@ class EventControllerTest {
 		when(eventService.getAvailableSeats(eventId)).thenReturn(50);
 		when(eventService.getTotalSeats(eventId)).thenReturn(100);
 
-		mockMvc.perform(get("/api/events/{id}/seats/available", eventId)
+		mockMvc.perform(get("/api/v1/events/{id}/seats/available", eventId)
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.total").value(100))

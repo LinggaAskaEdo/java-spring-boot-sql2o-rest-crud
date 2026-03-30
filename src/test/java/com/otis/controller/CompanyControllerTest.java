@@ -10,7 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -32,7 +31,6 @@ class CompanyControllerTest {
 	@Mock
 	private CompanyService companyService;
 
-	@InjectMocks
 	private CompanyController companyController;
 
 	private UUID companyId;
@@ -42,6 +40,7 @@ class CompanyControllerTest {
 	@BeforeEach
 	@SuppressWarnings("unused")
 	void setUp() {
+		companyController = new CompanyController(companyService, 100, 10);
 		mockMvc = MockMvcBuilders.standaloneSetup(companyController).build();
 		companyId = UUID.randomUUID();
 		company = new Company(companyId, "Test Company");
@@ -53,7 +52,7 @@ class CompanyControllerTest {
 		when(companyService.findByFilters(anyInt(), anyInt(), any(), any()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/companies")
+		mockMvc.perform(get("/api/v1/companies")
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isArray())
@@ -67,7 +66,7 @@ class CompanyControllerTest {
 		when(companyService.findByFilters(anyInt(), anyInt(), any(), any()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/companies")
+		mockMvc.perform(get("/api/v1/companies")
 				.param("page", "0")
 				.param("size", "10")
 				.contentType(MediaType.APPLICATION_JSON))
@@ -80,7 +79,7 @@ class CompanyControllerTest {
 		when(companyService.findByFilters(anyInt(), anyInt(), any(), any()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/companies")
+		mockMvc.perform(get("/api/v1/companies")
 				.param("id", companyId.toString())
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
@@ -92,7 +91,7 @@ class CompanyControllerTest {
 		when(companyService.findByFilters(anyInt(), anyInt(), any(), anyString()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/companies")
+		mockMvc.perform(get("/api/v1/companies")
 				.param("name", "Test Company")
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
@@ -105,7 +104,7 @@ class CompanyControllerTest {
 		when(companyService.findByFilters(anyInt(), anyInt(), any(), any()))
 				.thenReturn(emptyResponse);
 
-		mockMvc.perform(get("/api/companies")
+		mockMvc.perform(get("/api/v1/companies")
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isEmpty())
@@ -117,7 +116,7 @@ class CompanyControllerTest {
 		when(companyService.findByFilters(anyInt(), anyInt(), any(), anyString()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/companies")
+		mockMvc.perform(get("/api/v1/companies")
 				.param("page", "0")
 				.param("size", "10")
 				.param("id", companyId.toString())

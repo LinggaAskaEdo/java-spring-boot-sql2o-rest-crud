@@ -29,7 +29,6 @@ public class CompanyRepository {
 	}
 
 	public PageResponse<Company> findByFilters(int page, int size, UUID id, String name) {
-		// 1. Build filter parameters
 		Map<String, Object> filterParams = new HashMap<>();
 		if (id != null) {
 			filterParams.put(ConstantPreference.ID, id.toString());
@@ -39,41 +38,35 @@ public class CompanyRepository {
 			filterParams.put(ConstantPreference.NAME, "%" + name + "%");
 		}
 
-		// 2. Build pagination parameters
 		int offset = page * size;
 		Map<String, Object> pagingParams = new HashMap<>(filterParams);
 		pagingParams.put(ConstantPreference.SIZE, size);
 		pagingParams.put(ConstantPreference.OFFSET, offset);
 
-		// 3. Get the dynamic SQL
 		String findSql = bundle.getSql("FindByFilters", pagingParams);
-		String countSql = bundle.getSql("CountByFilters", filterParams); // count uses only filters
+		String countSql = bundle.getSql("CountByFilters", filterParams);
 
-		log.info("FindByFilters: {}", findSql);
-		log.info("CountByFilters: {}", countSql);
+		log.debug("FindByFilters: {}", findSql);
+		log.debug("CountByFilters: {}", countSql);
 
 		try (Connection conn = sql2o.open()) {
-			// Main query
-			Query query = conn.createQuery(findSql);
-			for (Map.Entry<String, Object> entry : pagingParams.entrySet()) {
-				query.addParameter(entry.getKey(), entry.getValue());
+			try (Query query = conn.createQuery(findSql);
+					Query countQuery = conn.createQuery(countSql)) {
+
+				for (Map.Entry<String, Object> entry : pagingParams.entrySet()) {
+					query.addParameter(entry.getKey(), entry.getValue());
+					countQuery.addParameter(entry.getKey(), entry.getValue());
+				}
+
+				var companies = query.executeAndFetch(Company.class);
+				long totalElements = countQuery.executeAndFetchFirst(Integer.class);
+
+				int totalPages = (int) Math.ceil((double) totalElements / size);
+				boolean isFirst = page == 0;
+				boolean isLast = page >= totalPages - 1;
+
+				return new PageResponse<>(companies, page, size, totalElements, totalPages, isFirst, isLast);
 			}
-
-			var companies = query.executeAndFetch(Company.class);
-
-			// Count query
-			Query countQuery = conn.createQuery(countSql);
-			for (Map.Entry<String, Object> entry : filterParams.entrySet()) {
-				countQuery.addParameter(entry.getKey(), entry.getValue());
-			}
-
-			long totalElements = countQuery.executeAndFetchFirst(Integer.class);
-
-			int totalPages = (int) Math.ceil((double) totalElements / size);
-			boolean isFirst = page == 0;
-			boolean isLast = page >= totalPages - 1;
-
-			return new PageResponse<>(companies, page, size, totalElements, totalPages, isFirst, isLast);
 		}
 	}
 }

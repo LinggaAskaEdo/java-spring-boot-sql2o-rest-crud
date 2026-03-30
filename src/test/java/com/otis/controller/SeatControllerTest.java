@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -32,7 +31,6 @@ class SeatControllerTest {
 	@Mock
 	private SeatService seatService;
 
-	@InjectMocks
 	private SeatController seatController;
 
 	private UUID eventId;
@@ -43,10 +41,11 @@ class SeatControllerTest {
 	@BeforeEach
 	@SuppressWarnings("unused")
 	void setUp() {
+		seatController = new SeatController(seatService, 100, 10);
 		mockMvc = MockMvcBuilders.standaloneSetup(seatController).build();
 		eventId = UUID.randomUUID();
 		reservationId = UUID.randomUUID();
-		seat = new Seat(UUID.randomUUID(), eventId, "A1", false, null);
+		seat = new Seat(UUID.randomUUID(), eventId, "A1", "available", null, null, 0, false, null);
 		pageResponse = new PageResponse<>(List.of(seat), 0, 20, 1, 1, true, true);
 	}
 
@@ -54,7 +53,7 @@ class SeatControllerTest {
 	void getSeatsByEvent_WithDefaultParams_ReturnsOk() throws Exception {
 		when(seatService.findByEventId(anyInt(), anyInt(), any())).thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/events/{eventId}/seats", eventId)
+		mockMvc.perform(get("/api/v1/events/{eventId}/seats", eventId)
 				.contentType(APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isArray())
@@ -67,7 +66,7 @@ class SeatControllerTest {
 	void getSeatsByEvent_WithPagination_ReturnsOk() throws Exception {
 		when(seatService.findByEventId(anyInt(), anyInt(), any())).thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/events/{eventId}/seats", eventId)
+		mockMvc.perform(get("/api/v1/events/{eventId}/seats", eventId)
 				.param("page", "0")
 				.param("size", "20")
 				.contentType(APPLICATION_JSON))
@@ -80,7 +79,7 @@ class SeatControllerTest {
 		PageResponse<Seat> emptyResponse = new PageResponse<>(Collections.emptyList(), 0, 20, 0, 0, true, true);
 		when(seatService.findByEventId(anyInt(), anyInt(), any())).thenReturn(emptyResponse);
 
-		mockMvc.perform(get("/api/events/{eventId}/seats", eventId)
+		mockMvc.perform(get("/api/v1/events/{eventId}/seats", eventId)
 				.contentType(APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isEmpty())
@@ -91,7 +90,7 @@ class SeatControllerTest {
 	void cancelReservation_WhenSuccessful_ReturnsNoContent() throws Exception {
 		when(seatService.cancelReservation(reservationId)).thenReturn(true);
 
-		mockMvc.perform(post("/api/reservations/{reservationId}/cancel", reservationId)
+		mockMvc.perform(post("/api/v1/reservations/{reservationId}/cancel", reservationId)
 				.contentType(APPLICATION_JSON))
 				.andExpect(status().isNoContent());
 	}
@@ -100,7 +99,7 @@ class SeatControllerTest {
 	void cancelReservation_WhenNotFound_ReturnsNotFound() throws Exception {
 		when(seatService.cancelReservation(any())).thenReturn(false);
 
-		mockMvc.perform(post("/api/reservations/{reservationId}/cancel", UUID.randomUUID())
+		mockMvc.perform(post("/api/v1/reservations/{reservationId}/cancel", UUID.randomUUID())
 				.contentType(APPLICATION_JSON))
 				.andExpect(status().isNotFound());
 	}

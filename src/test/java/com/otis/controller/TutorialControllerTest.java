@@ -11,7 +11,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -33,7 +32,6 @@ class TutorialControllerTest {
 	@Mock
 	private TutorialService tutorialService;
 
-	@InjectMocks
 	private TutorialController tutorialController;
 
 	private UUID tutorialId;
@@ -43,6 +41,7 @@ class TutorialControllerTest {
 	@BeforeEach
 	@SuppressWarnings("unused")
 	void setUp() {
+		tutorialController = new TutorialController(tutorialService, 100, 10);
 		mockMvc = MockMvcBuilders.standaloneSetup(tutorialController).build();
 		tutorialId = UUID.randomUUID();
 		tutorial = new Tutorial(tutorialId, "Test Tutorial", "Test Description", true);
@@ -54,7 +53,7 @@ class TutorialControllerTest {
 		when(tutorialService.findByFilters(anyInt(), anyInt(), any(), any(), any(), any()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/tutorials")
+		mockMvc.perform(get("/api/v1/tutorials")
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isArray())
@@ -68,7 +67,7 @@ class TutorialControllerTest {
 		when(tutorialService.findByFilters(anyInt(), anyInt(), any(), any(), any(), any()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/tutorials")
+		mockMvc.perform(get("/api/v1/tutorials")
 				.param("page", "0")
 				.param("size", "10")
 				.contentType(MediaType.APPLICATION_JSON))
@@ -81,7 +80,7 @@ class TutorialControllerTest {
 		when(tutorialService.findByFilters(anyInt(), anyInt(), any(), any(), any(), any()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/tutorials")
+		mockMvc.perform(get("/api/v1/tutorials")
 				.param("id", tutorialId.toString())
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
@@ -93,7 +92,7 @@ class TutorialControllerTest {
 		when(tutorialService.findByFilters(anyInt(), anyInt(), any(), anyString(), any(), any()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/tutorials")
+		mockMvc.perform(get("/api/v1/tutorials")
 				.param("title", "Test Tutorial")
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
@@ -105,7 +104,7 @@ class TutorialControllerTest {
 		when(tutorialService.findByFilters(anyInt(), anyInt(), any(), any(), anyString(), any()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/tutorials")
+		mockMvc.perform(get("/api/v1/tutorials")
 				.param("description", "Test Description")
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
@@ -117,7 +116,7 @@ class TutorialControllerTest {
 		when(tutorialService.findByFilters(anyInt(), anyInt(), any(), any(), any(), anyBoolean()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/tutorials")
+		mockMvc.perform(get("/api/v1/tutorials")
 				.param("published", "true")
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
@@ -130,7 +129,7 @@ class TutorialControllerTest {
 		when(tutorialService.findByFilters(anyInt(), anyInt(), any(), any(), any(), any()))
 				.thenReturn(emptyResponse);
 
-		mockMvc.perform(get("/api/tutorials")
+		mockMvc.perform(get("/api/v1/tutorials")
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").isEmpty())
@@ -142,7 +141,7 @@ class TutorialControllerTest {
 		when(tutorialService.findByFilters(anyInt(), anyInt(), any(), anyString(), anyString(), anyBoolean()))
 				.thenReturn(pageResponse);
 
-		mockMvc.perform(get("/api/tutorials")
+		mockMvc.perform(get("/api/v1/tutorials")
 				.param("page", "0")
 				.param("size", "10")
 				.param("id", tutorialId.toString())
